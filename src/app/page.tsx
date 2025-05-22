@@ -1,16 +1,18 @@
+
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppHeader } from '@/components/layout/app-header';
 import { FepSelector } from '@/components/triage/fep-selector';
 import { CceeForm } from '@/components/triage/ccee-form';
 import { ResourceDisplay } from '@/components/triage/resource-display';
+import { CameraView } from '@/components/triage/camera-view';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, RotateCcw } from 'lucide-react';
+import { AlertCircle, RotateCcw, Camera } from 'lucide-react';
 import { extractPatientData, type ExtractPatientDataInput, type ExtractPatientDataOutput } from '@/ai/flows/extract-patient-data';
 import { useToast } from "@/hooks/use-toast";
 import type { PatientData, CceeFormState, CceeScore, UnitType } from '@/types/triage';
@@ -38,6 +40,7 @@ export default function TriagePage() {
   const [isProcessingAI, setIsProcessingAI] = useState<boolean>(false);
   
   const [totalCceeScore, setTotalCceeScore] = useState<number | null>(null);
+  const [showCamera, setShowCamera] = useState<boolean>(false);
   
   const { toast } = useToast();
 
@@ -50,6 +53,7 @@ export default function TriagePage() {
     setAiExtractedData(null);
     setTotalCceeScore(null);
     setCurrentStep(1);
+    setShowCamera(false);
     toast({ title: "Formulario Reiniciado", description: "Puede comenzar un nuevo triaje." });
   }, [toast]);
 
@@ -158,6 +162,24 @@ export default function TriagePage() {
     }
   };
 
+  const handleOpenCamera = () => {
+    setShowCamera(true);
+  };
+
+  const handleCloseCamera = () => {
+    setShowCamera(false);
+  };
+
+  // Example of how you might use a captured image (e.g., set it as patient ID or part of notes)
+  // const handleCaptureImage = (imageDataUrl: string) => {
+  //   console.log("Captured image data URL:", imageDataUrl);
+  //   // Example: setPatientId(`Imagen capturada: ${new Date().toLocaleTimeString()}`);
+  //   // Or, append to notes: setAiPatientNotes(prev => `${prev}\n[Imagen adjunta ${new Date().toLocaleTimeString()}]`);
+  //   setShowCamera(false);
+  //   toast({ title: "Imagen Capturada", description: "La imagen ha sido capturada (ver consola)." });
+  // };
+
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
@@ -168,16 +190,22 @@ export default function TriagePage() {
             <CardHeader>
               <CardTitle className="text-xl">Identificación del Paciente (Opcional)</CardTitle>
             </CardHeader>
-            <CardContent>
-              <Label htmlFor="patientId">ID del Paciente / N° de Cama</Label>
-              <Input
-                id="patientId"
-                type="text"
-                value={patientId}
-                onChange={(e) => setPatientId(e.target.value)}
-                placeholder="Ej: 12345 / Cama 10A"
-                className="mt-1"
-              />
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="patientId">ID del Paciente / N° de Cama</Label>
+                <Input
+                  id="patientId"
+                  type="text"
+                  value={patientId}
+                  onChange={(e) => setPatientId(e.target.value)}
+                  placeholder="Ej: 12345 / Cama 10A"
+                  className="mt-1"
+                />
+              </div>
+              <Button variant="outline" onClick={handleOpenCamera} className="w-full sm:w-auto">
+                <Camera className="mr-2 h-4 w-4" />
+                Acceder a Cámara
+              </Button>
             </CardContent>
           </Card>
 
@@ -216,8 +244,14 @@ export default function TriagePage() {
         </div>
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-        SITECS Triage Assist &copy; {new Date().getFullYear()}
+        S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda &copy; {new Date().getFullYear()}
       </footer>
+
+      <CameraView 
+        isOpen={showCamera} 
+        onClose={handleCloseCamera}
+        // onCapture={handleCaptureImage} // Uncomment and implement if capture functionality is added
+      />
     </div>
   );
 }
