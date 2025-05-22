@@ -25,26 +25,20 @@ export function CceeCategoryInput({
   onValueChange,
   disabled = false,
 }: CceeCategoryInputProps) {
-  const [showDescriptions, setShowDescriptions] = useState(false);
+  const [expandedOptionValue, setExpandedOptionValue] = useState<CceeScore | string | null>(null);
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h4 className="text-md font-semibold text-foreground">{title}</h4>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setShowDescriptions(!showDescriptions)}
-          aria-label={showDescriptions ? "Ocultar descripciones" : "Mostrar descripciones"}
-          className="px-2 py-1 h-auto"
-        >
-          <Info className="h-4 w-4 mr-1" />
-          {showDescriptions ? 'Ocultar' : 'Ayuda'}
-        </Button>
+        {/* Global help button removed as per new requirement for per-option help */}
       </div>
       <RadioGroup
         value={selectedValue?.toString()}
-        onValueChange={(val) => onValueChange(parseInt(val) as CceeScore)}
+        onValueChange={(val) => {
+          onValueChange(parseInt(val) as CceeScore);
+          setExpandedOptionValue(null); // Collapse description when selection changes
+        }}
         className="space-y-2"
         disabled={disabled}
       >
@@ -52,15 +46,30 @@ export function CceeCategoryInput({
           <div key={option.value} className="flex items-start space-x-3 p-2 border rounded-md hover:bg-accent/20 transition-colors">
             <RadioGroupItem value={option.value.toString()} id={`${id}-${option.value}`} className="mt-1 shrink-0" />
             <div className="flex-grow">
-              <Label htmlFor={`${id}-${option.value}`} className="font-medium cursor-pointer">
-                {option.label}
-              </Label>
-              {showDescriptions && (
-                <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-line">{option.description}</p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor={`${id}-${option.value}`} className="font-medium cursor-pointer flex-grow py-1">
+                  {option.label}
+                </Label>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground shrink-0 ml-2"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent radio selection if clicking on info button
+                    setExpandedOptionValue(current => current === option.value ? null : option.value);
+                  }}
+                  aria-label={`Mostrar descripción para ${option.label}`}
+                  title={`Mostrar/ocultar descripción para ${option.label}`}
+                >
+                  <Info className="h-4 w-4" />
+                </Button>
+              </div>
+              {expandedOptionValue === option.value && (
+                <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-line pb-1">{option.description}</p>
               )}
             </div>
             {selectedValue === option.value && (
-               <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+               <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-1" />
             )}
           </div>
         ))}
@@ -68,3 +77,4 @@ export function CceeCategoryInput({
     </div>
   );
 }
+
