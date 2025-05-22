@@ -72,8 +72,8 @@ export const OXYGEN_NEED_LEVELS: OxygenNeedLevelOption[] = [
   },
   { 
     value: 2, 
-    label: 'NEB Pautadas', 
-    description: 'Tratamiento con nebulizaciones o aerosoles, de forma pautada, por lo que necesitará oxígeno por periodos de tiempo limitado, al recibir tratamiento.\nCálculo de la Previsión necesidades de oxígeno para 24 horas: Una nebulización con oxígeno (las de aire precisarían balas de aire comprimido, menos abundantes en el entorno hospitalario, o tomas de pared de aire y/o aparato nebulizador enchufado a corriente eléctrica), requiere un caudal mínimo de 6 l/min de oxígeno medicinal, durante 10 a 15 minutos, lo que nos deja un consumo de oxígeno de (6 l/min. X 15 min.=) 90 litros, para 4 nebulizaciones cada 24 horas (pauta c/8h y una extra de rescate, o c/6h), por lo que nos deja un gasto de (90 litros/NEB x 4 NEB =) 360 litros/24h, luego necesitaremos al menos una bala de 2 litros a 200 bares (= 400 litros) para ese paciente.',
+    label: 'Nebulizaciones Pautadas', 
+    description: 'Tratamiento con nebulizaciones o aerosoles, de forma pautada, por lo que necesitará oxígeno por periodos de tiempo limitado, al recibir tratamiento.\nCálculo de la Previsión necesidades de oxígeno para 24 horas: Una nebulización con oxígeno (las de aire precisarían balas de aire comprimido, menos abundantes en el entorno hospitalario, o tomas de pared de aire y/o aparato nebulizador enchufado a corriente eléctrica), requiere un caudal mínimo de 6 l/min de oxígeno medicinal, durante 10 a 15 minutos, lo que nos deja un consumo de oxígeno de (6 l/min. X 15 min.=) 90 litros, para 4 nebulizaciones cada 24 horas (pauta c/8h y una extra de rescate, o c/6h), por lo que nos deja un gasto de (90 litros/Nebulización x 4 Nebulizaciones =) 360 litros/24h, luego necesitaremos al menos una bala de 2 litros a 200 bares (= 400 litros) para ese paciente.',
     litersPer24h: 360
   },
   { 
@@ -178,3 +178,4 @@ export const getFepLevelInfo = (value: CceeScore | undefined): FepLevelOption | 
   if (value === undefined) return undefined;
   return FEP_LEVELS.find(level => level.value === value);
 };
+

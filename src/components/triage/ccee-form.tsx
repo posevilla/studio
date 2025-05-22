@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, Info } from 'lucide-react';
+import { ShieldCheck, Info, HelpCircle } from 'lucide-react'; // Added HelpCircle, kept Info
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -154,21 +154,34 @@ export function CceeForm({
           selectedValue={formState.oxygenNeed}
           onValueChange={(value) => handleCategoryChange('oxygenNeed', value)}
         />
-        {oxygenConsumption.needs12h !== null && oxygenConsumption.needs24h !== null && formState.oxygenNeed && (
+        {formState.oxygenNeed && (oxygenConsumption.needs12h !== null || oxygenConsumption.needs24h !== null) && (
           <Alert variant="default" className="mt-4">
             <Info className="h-5 w-5" />
-            <AlertTitle className="font-semibold">Previsión de Necesidades de Oxígeno (aprox.)</AlertTitle>
+            <AlertTitle className="font-semibold">Información Adicional sobre Necesidad de Oxígeno</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pl-5 mt-1 space-y-1">
-                <li>Para 12 horas: <span className="font-medium">{oxygenConsumption.needs12h.toLocaleString()}</span> litros</li>
-                <li>Para 24 horas: <span className="font-medium">{oxygenConsumption.needs24h.toLocaleString()}</span> litros</li>
+                <li>Puntuación C.C.E.E. para Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
+                {oxygenConsumption.needs12h !== null && (
+                  <li>Previsión para 12 horas: <span className="font-medium">{oxygenConsumption.needs12h.toLocaleString()}</span> litros (aprox.)</li>
+                )}
+                {oxygenConsumption.needs24h !== null && (
+                  <li>Previsión para 24 horas: <span className="font-medium">{oxygenConsumption.needs24h.toLocaleString()}</span> litros (aprox.)</li>
+                )}
               </ul>
-              <p className="text-xs text-muted-foreground mt-2">
-                Estos cálculos son una estimación basada en el nivel seleccionado.
-              </p>
+              { (oxygenConsumption.needs12h === null || oxygenConsumption.needs24h === null) && formState.oxygenNeed && OXYGEN_NEED_LEVELS.find(o => o.value === formState.oxygenNeed)?.litersPer24h === 0 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  No se requiere previsión de litros para el nivel seleccionado.
+                </p>
+              )}
+              { (oxygenConsumption.needs12h !== null || oxygenConsumption.needs24h !== null) && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Estos cálculos son una estimación basada en el nivel seleccionado.
+                </p>
+              )}
             </AlertDescription>
           </Alert>
         )}
+
 
         <Separator />
         <CceeCategoryInput
