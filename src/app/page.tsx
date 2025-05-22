@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { RotateCcw, Camera } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { RotateCcw, Camera, History } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { CceeFormState, CceeScore } from '@/types/triage';
 
@@ -36,8 +37,11 @@ export default function TriagePage() {
     
   const [totalCceeScore, setTotalCceeScore] = useState<number | null>(null);
   const [showCamera, setShowCamera] = useState<boolean>(false);
-  const [capturedImage, setCapturedImage] = useState<string | null>(null); // State for captured image
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   
+  const [showRetrieveDialog, setShowRetrieveDialog] = useState<boolean>(false);
+  const [retrievePatientIdInput, setRetrievePatientIdInput] = useState<string>('');
+
   const { toast } = useToast();
 
   const performFullReset = useCallback(() => {
@@ -47,18 +51,20 @@ export default function TriagePage() {
     setTotalCceeScore(null);
     setCurrentStep(1);
     setShowCamera(false);
-    setCapturedImage(null); // Reset captured image
+    setCapturedImage(null);
+    setShowRetrieveDialog(false);
+    setRetrievePatientIdInput('');
     toast({ title: "Formulario Reiniciado Completamente", description: "Puede comenzar un nuevo triaje." });
   }, [toast]);
 
   useEffect(() => {
     if (selectedFep) {
       setCceeFormState(prev => ({ ...prev, fep: selectedFep }));
-      if (currentStep === 1) { // Only auto-advance if we are in step 1
+      if (currentStep === 1 && cceeFormState.fep !== selectedFep) { // Only auto-advance if we are in step 1 AND FEP actually changed
         setCurrentStep(2); 
       }
     }
-  }, [selectedFep, currentStep]);
+  }, [selectedFep, currentStep, cceeFormState.fep]);
   
   const calculateTotalCceeScore = useCallback(() => {
     const { fep, oxygenNeed, vitalSignsControl, medicationAndNutrition, unitType, unitSpecificScale } = cceeFormState;
@@ -113,13 +119,82 @@ export default function TriagePage() {
   };
 
   const handleCaptureImage = (imageDataUrl: string) => {
-    setCapturedImage(imageDataUrl); // Store captured image data URL
+    setCapturedImage(imageDataUrl);
     toast({
       title: "Imagen Capturada",
-      description: "La imagen ha sido capturada.",
+      description: "La imagen ha sido capturada y está disponible para el triaje C.C.E.E.",
     });
-    setShowCamera(false); // Close camera view after capture
+    setShowCamera(false); 
   };
+
+  const handleOpenRetrieveDialog = () => {
+    setRetrievePatientIdInput(''); 
+    setShowRetrieveDialog(true);
+  };
+
+  const handleCloseRetrieveDialog = () => {
+    setShowRetrieveDialog(false);
+  };
+
+  const handleConfirmRetrievePatient = () => {
+    if (!retrievePatientIdInput.trim()) {
+      toast({
+        title: "ID Inválido",
+        description: "Por favor, introduzca un ID de paciente.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    console.log(`Simulating retrieval for patient ID: ${retrievePatientIdInput}`);
+    
+    // --- Simulation Logic ---
+    let retrievedFep: CceeScore | undefined = undefined;
+    let patientFound = false;
+
+    if (retrievePatientIdInput.toUpperCase() === "RET-123") {
+      setPatientId("RET-123");
+      retrievedFep = 3 as CceeScore;
+      patientFound = true;
+      toast({
+        title: "Paciente Recuperado",
+        description: `Paciente ${retrievePatientIdInput} recuperado con F.E.P. ${retrievedFep}.`,
+      });
+    } else if (retrievePatientIdInput.toUpperCase() === "NOFEP-456") {
+      setPatientId("NOFEP-456");
+      retrievedFep = undefined; // Patient exists but no FEP done
+      patientFound = true;
+      toast({
+        title: "Paciente Encontrado (Sin F.E.P.)",
+        description: `Se encontró al paciente ${retrievePatientIdInput}, pero no tiene un triaje F.E.P. previo. Por favor, seleccione un F.E.P.`,
+      });
+    } else {
+      toast({
+        title: "Paciente No Encontrado",
+        description: `No se encontró información de triaje F.E.P. para el ID: ${retrievePatientIdInput}.`,
+        variant: "destructive",
+      });
+    }
+
+    if (patientFound) {
+      setSelectedFep(retrievedFep);
+      setCapturedImage(null); // Clear any existing captured image from previous patient
+      setCceeFormState(prev => ({ // Reset CCEE form fields, but keep new FEP
+        ...initialCceeFormState,
+        fep: retrievedFep,
+      }));
+      setTotalCceeScore(null); // Recalculate CCEE
+      if (retrievedFep) {
+        setCurrentStep(2); // Move to CCEE form if FEP was retrieved
+      } else {
+        setCurrentStep(1); // Stay on FEP selection if no FEP was retrieved
+      }
+    }
+    // --- End Simulation Logic ---
+
+    handleCloseRetrieveDialog();
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -161,7 +236,7 @@ export default function TriagePage() {
               setFormState={setCceeFormState}
               onFormComplete={handleCceeFormComplete}
               totalCceeScore={totalCceeScore}
-              capturedImage={capturedImage} // Pass captured image
+              capturedImage={capturedImage}
             />
           )}
 
@@ -171,10 +246,14 @@ export default function TriagePage() {
           
           <Separator className="my-8" />
 
-          <div className="flex justify-center">
-            <Button variant="outline" onClick={performFullReset} className="text-lg py-3 px-6">
+          <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-4">
+            <Button variant="outline" onClick={performFullReset} className="text-lg py-3 px-6 w-full sm:w-auto">
               <RotateCcw className="mr-2 h-5 w-5" />
               Reiniciar / Nuevo Paciente
+            </Button>
+            <Button variant="outline" onClick={handleOpenRetrieveDialog} className="text-lg py-3 px-6 w-full sm:w-auto">
+              <History className="mr-2 h-5 w-5" />
+              Recuperar Paciente Triado
             </Button>
           </div>
 
@@ -189,6 +268,39 @@ export default function TriagePage() {
         onClose={handleCloseCamera}
         onCapture={handleCaptureImage}
       />
+
+      <Dialog open={showRetrieveDialog} onOpenChange={setShowRetrieveDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Recuperar Paciente Triado</DialogTitle>
+            <DialogDescription>
+              Introduzca el ID del Paciente / N° de Cama para recuperar su triaje F.E.P. previo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="retrieve-patient-id-input" className="text-right col-span-1">
+                ID Paciente
+              </Label>
+              <Input
+                id="retrieve-patient-id-input"
+                value={retrievePatientIdInput}
+                onChange={(e) => setRetrievePatientIdInput(e.target.value)}
+                className="col-span-3"
+                placeholder="Ej: RET-123"
+              />
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-end gap-2 sm:gap-0">
+            <Button type="button" variant="outline" onClick={handleCloseRetrieveDialog}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleConfirmRetrievePatient}>
+              Recuperar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
