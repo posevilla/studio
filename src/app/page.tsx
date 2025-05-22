@@ -221,7 +221,7 @@ export default function TriagePage() {
           
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-xl">Identificación del Paciente (Opcional)</CardTitle>
+              <CardTitle className="text-xl text-center">Identificación del Paciente (Opcional)</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-4">
               <div className="w-full max-w-xs sm:max-w-sm">
