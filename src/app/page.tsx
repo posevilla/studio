@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image'; // Import next/image
 import { AppHeader } from '@/components/layout/app-header';
 import { FepSelector } from '@/components/triage/fep-selector';
 import { CceeForm } from '@/components/triage/ccee-form';
@@ -35,6 +36,7 @@ export default function TriagePage() {
     
   const [totalCceeScore, setTotalCceeScore] = useState<number | null>(null);
   const [showCamera, setShowCamera] = useState<boolean>(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null); // State for captured image
   
   const { toast } = useToast();
 
@@ -45,6 +47,7 @@ export default function TriagePage() {
     setTotalCceeScore(null);
     setCurrentStep(1);
     setShowCamera(false);
+    setCapturedImage(null); // Reset captured image
     toast({ title: "Formulario Reiniciado Completamente", description: "Puede comenzar un nuevo triaje." });
   }, [toast]);
 
@@ -110,10 +113,10 @@ export default function TriagePage() {
   };
 
   const handleCaptureImage = (imageDataUrl: string) => {
-    console.log("Captured image data URL:", imageDataUrl); // For debugging
+    setCapturedImage(imageDataUrl); // Store captured image data URL
     toast({
       title: "Imagen Capturada",
-      description: "La imagen ha sido capturada y está lista para ser procesada (funcionalidad futura).",
+      description: "La imagen ha sido capturada.",
     });
     setShowCamera(false); // Close camera view after capture
   };
@@ -157,6 +160,7 @@ export default function TriagePage() {
               setFormState={setCceeFormState}
               onFormComplete={handleCceeFormComplete}
               totalCceeScore={totalCceeScore}
+              capturedImage={capturedImage} // Pass captured image
             />
           )}
 

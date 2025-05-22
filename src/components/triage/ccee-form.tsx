@@ -2,6 +2,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
+import Image from 'next/image'; // Import next/image
 import type { CceeFormState, UnitType, CceeScore } from '@/types/triage';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,7 @@ interface CceeFormProps {
   setFormState: Dispatch<SetStateAction<CceeFormState>>;
   onFormComplete: () => void;
   totalCceeScore: number | null;
+  capturedImage?: string | null; // Prop for captured image
 }
 
 export function CceeForm({
@@ -35,6 +37,7 @@ export function CceeForm({
   setFormState,
   onFormComplete,
   totalCceeScore,
+  capturedImage, // Destructure captured image
 }: CceeFormProps) {
   
   const handleCategoryChange = (category: keyof Omit<CceeFormState, 'fep' | 'unitType'>, value: CceeScore) => {
@@ -63,19 +66,35 @@ export function CceeForm({
         <CardTitle className="text-xl">2. Triaje Avanzado o Secundario (C.C.E.E.)</CardTitle>
         <CardDescription className="text-center">
           Complete los detalles para calcular la Complejidad de Cuidados de Evacuación y Estancia.
-          <div className="flex flex-col items-center my-4">
-            <span className="text-sm text-muted-foreground mb-1">F.E.P. Seleccionado:</span>
-            {selectedFepInfo && (
-              <div
-                className={cn(
-                  "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-md border-2 border-foreground/20",
-                  selectedFepInfo.color, 
-                  selectedFepInfo.textColorClassName
-                )}
-              >
-                {fepScore}
-              </div>
-            )}
+          <div className="flex flex-col items-center my-4 space-y-2">
+            <div className="flex items-center justify-center space-x-4">
+              {selectedFepInfo && (
+                <div
+                  className={cn(
+                    "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-md border-2 border-foreground/20 shrink-0",
+                    selectedFepInfo.color, 
+                    selectedFepInfo.textColorClassName
+                  )}
+                  aria-label={`Nivel F.E.P. ${fepScore}`}
+                >
+                  {fepScore}
+                </div>
+              )}
+              {capturedImage && (
+                <div className="relative w-20 h-20 rounded-md overflow-hidden shadow-md border border-border">
+                  <Image
+                    src={capturedImage}
+                    alt="Imagen capturada del paciente"
+                    layout="fill"
+                    objectFit="cover"
+                    data-ai-hint="patient identification" 
+                  />
+                </div>
+              )}
+            </div>
+             <span className="text-sm text-muted-foreground pt-1">
+                {capturedImage ? "F.E.P. Seleccionado e Imagen:" : "F.E.P. Seleccionado:"}
+            </span>
           </div>
         </CardDescription>
       </CardHeader>
