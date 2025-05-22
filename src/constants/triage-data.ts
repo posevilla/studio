@@ -3,6 +3,8 @@ import type { SelectOption, UnitType, ResourceRecommendation, CceeScore } from '
 
 // Extend SelectOption for FEP_LEVELS to include textColorClassName, iconSrc, and iconAiHint
 export interface FepLevelOption extends SelectOption<CceeScore> {
+  bgColorClassName: string;
+  hoverBgColorClassName: string;
   textColorClassName: string;
   iconSrc?: string;
   iconAiHint?: string;
@@ -13,45 +15,50 @@ export const FEP_LEVELS: FepLevelOption[] = [
     value: 1, 
     label: 'Nivel 1 - Verde', 
     description: 'Evacuación MUY FÁCIL: Puede evacuar él solo (sin ayuda de ningún tipo).', 
-    color: 'bg-green-500 hover:bg-green-600', 
-    textColorClassName: 'text-black',
-    iconSrc: 'https://placehold.co/40x32.png', 
+    bgColorClassName: 'bg-green-500',
+    hoverBgColorClassName: 'hover:bg-green-600',
+    textColorClassName: 'text-black dark:text-white', // Adjusted for dark mode
+    iconSrc: '/images/fep-level-1.png', 
     iconAiHint: 'stick figure evacuation' 
   },
   { 
     value: 2, 
     label: 'Nivel 2 - Amarillo', 
     description: 'Evacuación FÁCIL: Puede evacuar con POCA ayuda (de otros enfermos/residentes, familiares, etc.). Uso de bastón, muletas, andador o apoyado, a buen ritmo.', 
-    color: 'bg-yellow-400 hover:bg-yellow-500', 
-    textColorClassName: 'text-black',
-    iconSrc: 'https://placehold.co/40x32.png',
+    bgColorClassName: 'bg-yellow-400',
+    hoverBgColorClassName: 'hover:bg-yellow-500',
+    textColorClassName: 'text-black dark:text-gray-800', // Adjusted for dark mode
+    iconSrc: '/images/fep-level-2.png',
     iconAiHint: 'mobility aids' 
   },
   { 
     value: 3, 
     label: 'Nivel 3 - Naranja', 
     description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', 
-    color: 'bg-orange-500 hover:bg-orange-600', 
-    textColorClassName: 'text-black',
-    iconSrc: 'https://placehold.co/40x32.png',
+    bgColorClassName: 'bg-orange-500',
+    hoverBgColorClassName: 'hover:bg-orange-600',
+    textColorClassName: 'text-black dark:text-white', // Adjusted for dark mode
+    iconSrc: '/images/fep-level-3.png',
     iconAiHint: 'wheelchair assistance'
   },
   { 
     value: 4, 
     label: 'Nivel 4 - Rojo', 
     description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', 
-    color: 'bg-red-600 hover:bg-red-700', 
+    bgColorClassName: 'bg-red-600',
+    hoverBgColorClassName: 'hover:bg-red-700',
     textColorClassName: 'text-white',
-    iconSrc: 'https://placehold.co/40x32.png',
+    iconSrc: '/images/fep-level-4.png',
     iconAiHint: 'stretcher wheelchair'
   },
   { 
     value: 5, 
     label: 'Nivel 5 - Azul', 
     description: 'Evacuación MUY DIFÍCIL: Necesita ayuda y soporte del personal del centro (dos o más personas).', 
-    color: 'bg-blue-600 hover:bg-blue-700', 
+    bgColorClassName: 'bg-blue-600',
+    hoverBgColorClassName: 'hover:bg-blue-700',
     textColorClassName: 'text-white',
-    iconSrc: 'https://placehold.co/60x48.png', // Adjusted placeholder size for potentially larger image
+    iconSrc: '/images/fep-level-5.png',
     iconAiHint: 'stretcher emergency'
   },
 ];
@@ -141,3 +148,8 @@ export const getResourceRecommendation = (score: number): ResourceRecommendation
   return undefined;
 };
 
+// Helper to get FEP level details by value
+export const getFepLevelInfo = (value: CceeScore | undefined): FepLevelOption | undefined => {
+  if (value === undefined) return undefined;
+  return FEP_LEVELS.find(level => level.value === value);
+};

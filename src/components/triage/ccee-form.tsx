@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/accordion";
 
 import {
-  FEP_LEVELS,
+  getFepLevelInfo, // Import the helper
   OXYGEN_NEED_LEVELS,
   VITAL_SIGNS_LEVELS,
   MEDICATION_NUTRITION_LEVELS,
@@ -64,7 +64,7 @@ export function CceeForm({
     );
   };
 
-  const selectedFepInfo = FEP_LEVELS.find(level => level.value === fepScore);
+  const selectedFepInfo = getFepLevelInfo(fepScore);
 
   return (
     <Card className="w-full shadow-lg">
@@ -78,7 +78,7 @@ export function CceeForm({
                 <div
                   className={cn(
                     "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-md border-2 border-foreground/20 shrink-0",
-                    selectedFepInfo.color, 
+                    selectedFepInfo.bgColorClassName, 
                     selectedFepInfo.textColorClassName
                   )}
                   aria-label={`Nivel F.E.P. ${fepScore}`}

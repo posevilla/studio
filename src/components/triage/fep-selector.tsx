@@ -54,15 +54,20 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
           {FEP_LEVELS.map((level) => (
             <Button
               key={level.value}
-              variant="ghost" // Changed to ghost variant
+              variant="ghost"
               className={cn(
                 "h-auto p-4 flex flex-col items-center text-center whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105 focus:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                level.color, // Applies bg-COLOR and hover:bg-COLOR_HOVER
-                level.textColorClassName, // Applies text-COLOR
+                level.bgColorClassName,
+                level.hoverBgColorClassName,
+                level.textColorClassName,
                 selectedFep === level.value
-                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg border border-foreground/50' // Selected: ring, shadow, and specific border
-                  : 'border border-border', // Unselected: standard border
-                level.value === 5 && (FEP_LEVELS.length % 2 !== 0 || FEP_LEVELS.length % 3 !== 0) ? 'md:col-span-2 lg:col-span-3 lg:mx-auto md:max-w-xs' : ''
+                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg border border-foreground/50'
+                  : 'border border-border',
+                // Logic for centering the last item if it's alone in its row on MD or LG screens
+                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 2 !== 0 ? 'md:col-span-2 md:mx-auto' : '',
+                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 3 === 1 ? 'lg:col-span-3 lg:mx-auto' : '',
+                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 3 === 2 && FEP_LEVELS.length > 2 && level.value === FEP_LEVELS[FEP_LEVELS.length-1].value ? 'lg:col-start-2' : '' // If 2 items in last row of 3-col grid, start 2nd item in 2nd col
+
               )}
               onClick={() => onFepSelect(level.value)}
             >
