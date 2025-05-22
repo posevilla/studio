@@ -8,7 +8,7 @@ export function AppHeader() {
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <SitecsLogo className="h-8 w-8 text-primary" />
           <span className="font-bold sm:inline-block text-lg">
-            SITECS Triage Assist
+            S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda
           </span>
         </Link>
       </div>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SITECS Triage Assist',
+  title: 'S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda',
   description: 'Application for SITECS hospital patient triage model.',
 };
 
