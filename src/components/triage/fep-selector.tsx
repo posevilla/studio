@@ -23,8 +23,8 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
-        <CardTitle className="text-xl">1. Triaje Primario (F.E.P.)</CardTitle>
-        <CardDescription>Seleccione la Facilidad de Evacuación del Paciente.</CardDescription>
+        <CardTitle className="text-xl text-center">1. Triaje Primario o Básico (F.E.P)</CardTitle>
+        <CardDescription className="text-center">Seleccione la Facilidad de Evacuación del Paciente.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Accordion type="single" collapsible className="w-full mb-4">
@@ -35,7 +35,7 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
             <AccordionContent>
               <div className="relative w-full aspect-[843/799] max-w-lg mx-auto bg-muted/30 rounded-md p-2">
                 <Image
-                  src="https://placehold.co/843x799.png" 
+                  src="/images/fep-flowchart.png"
                   alt="Diagrama de flujo para la selección de F.E.P."
                   width={843}
                   height={799}
@@ -61,12 +61,12 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
                 selectedFep === level.value
                   ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' 
                   : 'border border-border',
-                level.value === 5 && 'md:col-span-2 lg:col-span-3' // Centering for the 5th item
+                level.value === 5 && (FEP_LEVELS.length % 2 !== 0 || FEP_LEVELS.length % 3 !== 0) ? 'md:col-span-2 lg:col-span-3' : '' 
               )}
               onClick={() => onFepSelect(level.value)}
             >
               {level.iconSrc && (
-                <div className="relative w-12 h-10 mb-2"> {/* Increased width for potentially wider Nivel 5 icon */}
+                <div className="relative w-12 h-10 mb-2">
                   <Image
                     src={level.iconSrc}
                     alt={`Icono para ${level.label}`}
