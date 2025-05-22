@@ -234,7 +234,7 @@ export default function TriagePage() {
                   placeholder="Ej: 12345 / Cama 10A"
                 />
               </div>
-              <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm sm:w-auto py-2 px-4 h-auto">
+              <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm py-2 px-4 h-auto">
                 <div className="flex flex-col items-center gap-1">
                   <Camera className="h-5 w-5" />
                   <span>Acceder a Cámara</span>
