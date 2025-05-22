@@ -2,7 +2,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
-import Image from 'next/image'; // Import next/image
+import Image from 'next/image';
 import type { CceeFormState, UnitType, CceeScore } from '@/types/triage';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,12 @@ import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 import {
   FEP_LEVELS,
@@ -28,7 +34,7 @@ interface CceeFormProps {
   setFormState: Dispatch<SetStateAction<CceeFormState>>;
   onFormComplete: () => void;
   totalCceeScore: number | null;
-  capturedImage?: string | null; // Prop for captured image
+  capturedImage?: string | null;
 }
 
 export function CceeForm({
@@ -37,7 +43,7 @@ export function CceeForm({
   setFormState,
   onFormComplete,
   totalCceeScore,
-  capturedImage, // Destructure captured image
+  capturedImage,
 }: CceeFormProps) {
   
   const handleCategoryChange = (category: keyof Omit<CceeFormState, 'fep' | 'unitType'>, value: CceeScore) => {
@@ -45,7 +51,7 @@ export function CceeForm({
   };
 
   const handleUnitTypeChange = (value: UnitType) => {
-    setFormState((prev) => ({ ...prev, unitType: value, unitSpecificScale: undefined })); // Reset unitSpecificScale when unitType changes
+    setFormState((prev) => ({ ...prev, unitType: value, unitSpecificScale: undefined }));
   };
 
   const isFormValid = () => {
@@ -97,6 +103,28 @@ export function CceeForm({
             </span>
           </div>
         </CardDescription>
+        <Accordion type="single" collapsible className="w-full mb-2 px-6">
+          <AccordionItem value="ccee-table">
+            <AccordionTrigger className="text-sm hover:no-underline text-center justify-center">
+              Ver Tabla de Puntuación C.C.E.E. de Referencia
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="relative w-full aspect-[1000/706] max-w-2xl mx-auto bg-muted/30 rounded-md p-2">
+                <Image
+                  src="/images/ccee-scoring-table.png" 
+                  alt="Tabla de puntuación C.C.E.E."
+                  width={1000}
+                  height={706}
+                  className="rounded-md object-contain"
+                  data-ai-hint="scoring table"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Esta es una tabla de ejemplo. Reemplácela con su imagen de la tabla C.C.E.E.
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </CardHeader>
       <CardContent className="space-y-6">
         <Separator />
@@ -126,7 +154,6 @@ export function CceeForm({
         />
         <Separator />
 
-        {/* Unit Type Selection */}
         <CceeCategoryInput
           id="unitType"
           title="E - Tipo de Unidad (para Escala Específica)"
