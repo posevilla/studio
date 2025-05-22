@@ -7,11 +7,12 @@ import { FepSelector } from '@/components/triage/fep-selector';
 import { CceeForm } from '@/components/triage/ccee-form';
 import { ResourceDisplay } from '@/components/triage/resource-display';
 import { CameraView } from '@/components/triage/camera-view';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { AlertCircle, RotateCcw, Camera } from 'lucide-react';
 import { extractPatientData, type ExtractPatientDataInput, type ExtractPatientDataOutput } from '@/ai/flows/extract-patient-data';
 import { useToast } from "@/hooks/use-toast";
@@ -42,9 +43,11 @@ export default function TriagePage() {
   const [totalCceeScore, setTotalCceeScore] = useState<number | null>(null);
   const [showCamera, setShowCamera] = useState<boolean>(false);
   
+  const [isConfirmResetDialogOpen, setIsConfirmResetDialogOpen] = useState<boolean>(false);
+
   const { toast } = useToast();
 
-  const resetForm = useCallback(() => {
+  const performFullReset = useCallback(() => {
     setPatientId('');
     setSelectedFep(undefined);
     setCceeFormState(initialCceeFormState);
@@ -54,13 +57,48 @@ export default function TriagePage() {
     setTotalCceeScore(null);
     setCurrentStep(1);
     setShowCamera(false);
-    toast({ title: "Formulario Reiniciado", description: "Puede comenzar un nuevo triaje." });
+    setIsConfirmResetDialogOpen(false); // Close dialog if open
+    toast({ title: "Formulario Reiniciado Completamente", description: "Puede comenzar un nuevo triaje." });
   }, [toast]);
+
+  const continueWithAIData = useCallback(() => {
+    setPatientId(''); // Clear patient ID for the new patient
+    // aiExtractedData, aiPatientNotes, aiLabResults are kept
+    // useEffect for aiExtractedData will apply values to cceeFormState.
+    // selectedFep is also updated by that useEffect if aiExtractedData.fep exists.
+
+    // Ensure FEP from AI is set for step progression if it exists
+    if (aiExtractedData?.fep) {
+      setSelectedFep(aiExtractedData.fep as CceeScore);
+      setCceeFormState(prev => ({ ...prev, fep: aiExtractedData.fep as CceeScore }));
+    } else if (selectedFep) { // If AI didn't provide FEP, but user selected one, keep it for CCEE
+      setCceeFormState(prev => ({ ...prev, fep: selectedFep }));
+    }
+    
+    setCurrentStep(2); // Move to CCEE form
+    setIsConfirmResetDialogOpen(false); // Close dialog
+    toast({
+      title: "Continuando con Datos IA",
+      description: "Se han mantenido los datos de IA. Ingrese ID del nuevo paciente y proceda con el C.C.E.E.",
+    });
+  }, [aiExtractedData, toast, selectedFep]);
+
+
+  const handleResetOrContinue = () => {
+    // Check if there's meaningful AI data to offer continuation
+    if (aiExtractedData && (aiExtractedData.fep || aiExtractedData.oxygenNeed || aiExtractedData.vitalSignsControl || aiExtractedData.medicationAndNutrition || aiExtractedData.unitSpecificScale)) {
+      setIsConfirmResetDialogOpen(true);
+    } else {
+      performFullReset();
+    }
+  };
 
   useEffect(() => {
     if (selectedFep) {
       setCceeFormState(prev => ({ ...prev, fep: selectedFep }));
-      if (currentStep === 1) setCurrentStep(2); // Auto-advance to CCEE if FEP is selected
+      if (currentStep === 1) { // Only auto-advance if we are in step 1
+        setCurrentStep(2); 
+      }
     }
   }, [selectedFep, currentStep]);
 
@@ -69,21 +107,25 @@ export default function TriagePage() {
     if (aiExtractedData) {
       setCceeFormState(prev => ({
         ...prev,
-        fep: (aiExtractedData.fep as CceeScore) ?? prev.fep, // AI might also suggest FEP
+        fep: (aiExtractedData.fep as CceeScore) ?? prev.fep,
         oxygenNeed: (aiExtractedData.oxygenNeed as CceeScore) ?? prev.oxygenNeed,
         vitalSignsControl: (aiExtractedData.vitalSignsControl as CceeScore) ?? prev.vitalSignsControl,
         medicationAndNutrition: (aiExtractedData.medicationAndNutrition as CceeScore) ?? prev.medicationAndNutrition,
-        // Unit type must be selected by user. AI might suggest unitSpecificScale.
-        // If AI's unitSpecificScale is for a different unit type, user must reconcile.
-        // For now, we apply it directly. User must verify.
         unitSpecificScale: (aiExtractedData.unitSpecificScale as CceeScore) ?? prev.unitSpecificScale,
       }));
-      // If AI suggested FEP, update selectedFep as well
-      if (aiExtractedData.fep) {
-        setSelectedFep(aiExtractedData.fep as CceeScore);
+      // If AI suggested FEP, update selectedFep as well, this will trigger the above useEffect.
+      if (aiExtractedData.fep && prevSelectedFepRef.current !== aiExtractedData.fep) {
+         setSelectedFep(aiExtractedData.fep as CceeScore);
       }
     }
   }, [aiExtractedData]);
+  
+  // Ref to track previous selectedFep to avoid infinite loop with AI data setting
+  const prevSelectedFepRef = useRef<CceeScore | undefined>();
+  useEffect(() => {
+    prevSelectedFepRef.current = selectedFep;
+  });
+
 
   const handleExtractDataWithAI = async () => {
     if (!aiPatientNotes && !aiLabResults) {
@@ -120,20 +162,21 @@ export default function TriagePage() {
   };
   
   const calculateTotalCceeScore = useCallback(() => {
+    const { fep, oxygenNeed, vitalSignsControl, medicationAndNutrition, unitType, unitSpecificScale } = cceeFormState;
     if (
-      cceeFormState.fep &&
-      cceeFormState.oxygenNeed &&
-      cceeFormState.vitalSignsControl &&
-      cceeFormState.medicationAndNutrition &&
-      cceeFormState.unitType && // unitType must be chosen
-      cceeFormState.unitSpecificScale
+      fep &&
+      oxygenNeed &&
+      vitalSignsControl &&
+      medicationAndNutrition &&
+      unitType && 
+      unitSpecificScale
     ) {
       const score =
-        cceeFormState.fep +
-        cceeFormState.oxygenNeed +
-        cceeFormState.vitalSignsControl +
-        cceeFormState.medicationAndNutrition +
-        cceeFormState.unitSpecificScale;
+        fep +
+        oxygenNeed +
+        vitalSignsControl +
+        medicationAndNutrition +
+        unitSpecificScale;
       setTotalCceeScore(score);
       return score;
     }
@@ -170,16 +213,6 @@ export default function TriagePage() {
     setShowCamera(false);
   };
 
-  // Example of how you might use a captured image (e.g., set it as patient ID or part of notes)
-  // const handleCaptureImage = (imageDataUrl: string) => {
-  //   console.log("Captured image data URL:", imageDataUrl);
-  //   // Example: setPatientId(`Imagen capturada: ${new Date().toLocaleTimeString()}`);
-  //   // Or, append to notes: setAiPatientNotes(prev => `${prev}\n[Imagen adjunta ${new Date().toLocaleTimeString()}]`);
-  //   setShowCamera(false);
-  //   toast({ title: "Imagen Capturada", description: "La imagen ha sido capturada (ver consola)." });
-  // };
-
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
@@ -190,21 +223,22 @@ export default function TriagePage() {
             <CardHeader>
               <CardTitle className="text-xl">Identificación del Paciente (Opcional)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="patientId">ID del Paciente / N° de Cama</Label>
+            <CardContent className="flex flex-col items-center space-y-4">
+              <div className="w-full max-w-xs sm:max-w-sm">
+                <Label htmlFor="patientId" className="text-center block mb-1">ID del Paciente / N° de Cama</Label>
                 <Input
                   id="patientId"
                   type="text"
                   value={patientId}
                   onChange={(e) => setPatientId(e.target.value)}
                   placeholder="Ej: 12345 / Cama 10A"
-                  className="mt-1"
                 />
               </div>
-              <Button variant="outline" onClick={handleOpenCamera} className="w-full sm:w-auto">
-                <Camera className="mr-2 h-4 w-4" />
-                Acceder a Cámara
+              <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm sm:w-auto py-2 px-4 h-auto">
+                <div className="flex flex-col items-center gap-1">
+                  <Camera className="h-5 w-5" />
+                  <span>Acceder a Cámara</span>
+                </div>
               </Button>
             </CardContent>
           </Card>
@@ -235,7 +269,7 @@ export default function TriagePage() {
           <Separator className="my-8" />
 
           <div className="flex justify-center">
-            <Button variant="outline" onClick={resetForm} className="text-lg py-3 px-6">
+            <Button variant="outline" onClick={handleResetOrContinue} className="text-lg py-3 px-6">
               <RotateCcw className="mr-2 h-5 w-5" />
               Reiniciar / Nuevo Paciente
             </Button>
@@ -252,6 +286,27 @@ export default function TriagePage() {
         onClose={handleCloseCamera}
         // onCapture={handleCaptureImage} // Uncomment and implement if capture functionality is added
       />
+
+      <AlertDialog open={isConfirmResetDialogOpen} onOpenChange={setIsConfirmResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Cómo desea proceder?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se detectaron datos extraídos previamente por la IA. Puede iniciar un triaje completamente nuevo (borrando todos los datos) o continuar con los datos de la IA para el C.C.E.E. del siguiente paciente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsConfirmResetDialogOpen(false)}>Cancelar</AlertDialogCancel>
+            <Button variant="outline" onClick={continueWithAIData}>
+              Continuar con Datos IA
+            </Button>
+            <AlertDialogAction onClick={performFullReset} className={buttonVariants({ variant: "destructive" })}>
+              Limpiar Todo e Iniciar Nuevo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
