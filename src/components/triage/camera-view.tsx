@@ -5,13 +5,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CameraOff, Video, AlertTriangle, X } from 'lucide-react';
+import { CameraOff, Video, AlertTriangle, X, Camera as CameraIcon } from 'lucide-react'; // Added CameraIcon
 import { useToast } from '@/hooks/use-toast';
 
 interface CameraViewProps {
   isOpen: boolean;
   onClose: () => void;
-  onCapture?: (imageDataUrl: string) => void; // Optional: if you want to add capture functionality
+  onCapture?: (imageDataUrl: string) => void;
 }
 
 export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
@@ -58,21 +58,25 @@ export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
     getCameraPermission();
 
     return () => {
-      // Cleanup stream when component unmounts or isOpen becomes false
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
-        setStream(null);
+        setStream(null); // Ensure stream state is also cleared
          if (videoRef.current) {
             videoRef.current.srcObject = null;
         }
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, toast]); // stream dependency removed to prevent loop, handled internally
+  }, [isOpen]); // toast removed as it's stable, stream handled via setStream
 
   const handleCapture = () => {
-    if (videoRef.current && onCapture && hasCameraPermission) {
+    if (videoRef.current && onCapture && hasCameraPermission && stream) {
       const canvas = document.createElement('canvas');
+      // Ensure video dimensions are available
+      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
+        toast({ variant: 'destructive', title: 'Error de Captura', description: 'Dimensiones del video no disponibles. Intente de nuevo.'});
+        return;
+      }
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       const context = canvas.getContext('2d');
@@ -80,15 +84,17 @@ export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
         context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
         const imageDataUrl = canvas.toDataURL('image/png');
         onCapture(imageDataUrl);
+        // Parent component (TriagePage) will call onClose via setShowCamera(false) in its handleCaptureImage
+      } else {
+         toast({ variant: 'destructive', title: 'Error de Captura', description: 'No se pudo obtener el contexto del canvas.'});
       }
+    } else if (!onCapture) {
+      toast({ variant: 'destructive', title: 'Error de Configuración', description: 'Funcionalidad de captura no implementada.'});
     }
   };
   
-  // The Dialog's open state is controlled by the `isOpen` prop passed from the parent.
-  // The DialogClose component or calling onClose() will trigger the parent to set isOpen to false.
-
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="sm:max-w-[600px] p-0">
         <DialogHeader className="p-4 pb-0">
           <DialogTitle className="flex items-center">
@@ -98,28 +104,27 @@ export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
         </DialogHeader>
         
         <div className="p-4 relative">
-          {/* Video element is always rendered to satisfy hydration and race conditions */}
           <video 
             ref={videoRef} 
-            className={`w-full aspect-video rounded-md bg-muted ${hasCameraPermission === false ? 'hidden' : ''}`} 
+            className={`w-full aspect-video rounded-md bg-muted ${hasCameraPermission === false || hasCameraPermission === null ? 'hidden' : 'block'}`} 
             autoPlay 
-            playsInline // Important for iOS
-            muted // Muting is often required for autoplay without user interaction
+            playsInline
+            muted 
           />
 
           {hasCameraPermission === null && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 rounded-md">
+            <div className="w-full aspect-video flex flex-col items-center justify-center bg-muted rounded-md">
               <CameraOff className="h-12 w-12 text-muted-foreground mb-2" />
               <p className="text-muted-foreground">Solicitando acceso a la cámara...</p>
             </div>
           )}
 
           {hasCameraPermission === false && (
-             <Alert variant="destructive" className="mt-0">
-              <AlertTriangle className="h-4 w-4" />
+             <Alert variant="destructive" className="mt-0 w-full aspect-video flex flex-col items-center justify-center rounded-md">
+              <AlertTriangle className="h-8 w-8 mb-2" />
               <AlertTitle>Acceso a Cámara Denegado</AlertTitle>
-              <AlertDescription>
-                No se pudo acceder a la cámara. Verifique los permisos en su navegador e inténtelo de nuevo.
+              <AlertDescription className="text-center">
+                No se pudo acceder a la cámara. Verifique los permisos <br/> en su navegador e inténtelo de nuevo.
               </AlertDescription>
             </Alert>
           )}
@@ -128,7 +133,7 @@ export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
         <DialogFooter className="p-4 pt-0 flex flex-col sm:flex-row sm:justify-between gap-2">
           {onCapture && hasCameraPermission && (
             <Button onClick={handleCapture} variant="default" className="w-full sm:w-auto">
-              <Camera className="mr-2 h-4 w-4" />
+              <CameraIcon className="mr-2 h-4 w-4" />
               Capturar Foto
             </Button>
           )}
@@ -143,3 +148,5 @@ export function CameraView({ isOpen, onClose, onCapture }: CameraViewProps) {
     </Dialog>
   );
 }
+
+    

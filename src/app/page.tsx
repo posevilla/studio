@@ -42,6 +42,7 @@ export default function TriagePage() {
   
   const [totalCceeScore, setTotalCceeScore] = useState<number | null>(null);
   const [showCamera, setShowCamera] = useState<boolean>(false);
+  // const [capturedImageData, setCapturedImageData] = useState<string | null>(null); // State to store captured image data if needed later
   
   const [isConfirmResetDialogOpen, setIsConfirmResetDialogOpen] = useState<boolean>(false);
 
@@ -57,6 +58,7 @@ export default function TriagePage() {
     setTotalCceeScore(null);
     setCurrentStep(1);
     setShowCamera(false);
+    // setCapturedImageData(null);
     setIsConfirmResetDialogOpen(false); // Close dialog if open
     toast({ title: "Formulario Reiniciado Completamente", description: "Puede comenzar un nuevo triaje." });
   }, [toast]);
@@ -213,6 +215,16 @@ export default function TriagePage() {
     setShowCamera(false);
   };
 
+  const handleCaptureImage = (imageDataUrl: string) => {
+    // console.log("Captured image data URL:", imageDataUrl); // For debugging
+    // setCapturedImageData(imageDataUrl); // You can store this if needed
+    toast({
+      title: "Imagen Capturada",
+      description: "La imagen ha sido capturada y está lista para ser procesada (funcionalidad futura).",
+    });
+    setShowCamera(false); // Close camera view after capture
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
@@ -237,7 +249,7 @@ export default function TriagePage() {
               <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm py-2 px-4 h-auto">
                 <div className="flex flex-col items-center gap-1">
                   <Camera className="h-5 w-5" />
-                  <span>Acceder a Cámara</span>
+                  <span>Abrir Cámara</span>
                 </div>
               </Button>
             </CardContent>
@@ -284,7 +296,7 @@ export default function TriagePage() {
       <CameraView 
         isOpen={showCamera} 
         onClose={handleCloseCamera}
-        // onCapture={handleCaptureImage} // Uncomment and implement if capture functionality is added
+        onCapture={handleCaptureImage}
       />
 
       <AlertDialog open={isConfirmResetDialogOpen} onOpenChange={setIsConfirmResetDialogOpen}>
@@ -310,3 +322,5 @@ export default function TriagePage() {
     </div>
   );
 }
+
+    
