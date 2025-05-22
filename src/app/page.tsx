@@ -140,6 +140,7 @@ export default function TriagePage() {
                   value={patientId}
                   onChange={(e) => setPatientId(e.target.value)}
                   placeholder="Ej: 12345 / Cama 10A"
+                  className="text-center"
                 />
               </div>
               <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm py-2 px-4 h-auto">
