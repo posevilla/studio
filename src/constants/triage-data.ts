@@ -36,7 +36,15 @@ export const FEP_LEVELS: FepLevelOption[] = [
     iconSrc: 'https://placehold.co/40x32.png',
     iconAiHint: 'wheelchair assistance'
   },
-  { value: 4, label: 'Nivel 4 - Rojo', description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', color: 'bg-red-600 hover:bg-red-700', textColorClassName: 'text-white' },
+  { 
+    value: 4, 
+    label: 'Nivel 4 - Rojo', 
+    description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', 
+    color: 'bg-red-600 hover:bg-red-700', 
+    textColorClassName: 'text-white',
+    iconSrc: 'https://placehold.co/40x32.png',
+    iconAiHint: 'stretcher wheelchair'
+  },
   { value: 5, label: 'Nivel 5 - Azul', description: 'Evacuación MUY DIFÍCIL: Necesita ayuda y soporte del personal del centro (dos o más personas).', color: 'bg-blue-600 hover:bg-blue-700', textColorClassName: 'text-white' },
 ];
 
