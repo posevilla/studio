@@ -43,28 +43,28 @@
   .dark {
     /* Keeping dark mode, though not explicitly requested, good for accessibility options */
     --background: 210 20% 5%; 
-    --foreground: 210 20% 95%;
+    --foreground: 0 0% 100%; /* Changed from 210 20% 95% to pure white */
 
     --card: 210 20% 10%;
-    --card-foreground: 210 20% 95%;
+    --card-foreground: 0 0% 100%; /* Changed from 210 20% 95% to pure white */
 
     --popover: 210 20% 5%;
-    --popover-foreground: 210 20% 95%;
+    --popover-foreground: 0 0% 100%; /* Changed from 210 20% 95% to pure white */
 
-    --primary: 197 94% 74%;
-    --primary-foreground: 210 20% 10%;
+    --primary: 197 94% 74%; /* Sky Blue - remains light */
+    --primary-foreground: 210 20% 10%; /* Dark text on primary - remains dark for contrast */
 
     --secondary: 210 15% 15%;
-    --secondary-foreground: 210 20% 95%;
+    --secondary-foreground: 0 0% 100%; /* Changed from 210 20% 95% to pure white */
 
     --muted: 210 15% 20%;
-    --muted-foreground: 210 10% 60%;
+    --muted-foreground: 0 0% 85%; /* Changed from 210 10% 60% to very light gray */
 
-    --accent: 260 87% 86%;
-    --accent-foreground: 210 20% 10%;
+    --accent: 260 87% 86%; /* Soft Lavender - remains light */
+    --accent-foreground: 210 20% 10%; /* Dark text on accent - remains dark for contrast */
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 98%; /* Remains very light */
 
     --border: 210 10% 20%;
     --input: 210 10% 25%;
