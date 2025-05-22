@@ -35,7 +35,7 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
             <AccordionContent>
               <div className="relative w-full aspect-[843/799] max-w-lg mx-auto bg-muted/30 rounded-md p-2">
                 <Image
-                  src="https://placehold.co/843x799.png" // Consider moving this to public/images and referencing it like /images/fep-flowchart.png
+                  src="https://placehold.co/843x799.png" 
                   alt="Diagrama de flujo para la selección de F.E.P."
                   width={843}
                   height={799}
@@ -60,12 +60,13 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
                 level.textColorClassName, 
                 selectedFep === level.value
                   ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' 
-                  : 'border border-border' 
+                  : 'border border-border',
+                level.value === 5 && 'md:col-span-2 lg:col-span-3' // Centering for the 5th item
               )}
               onClick={() => onFepSelect(level.value)}
             >
               {level.iconSrc && (
-                <div className="relative w-10 h-8 mb-2">
+                <div className="relative w-12 h-10 mb-2"> {/* Increased width for potentially wider Nivel 5 icon */}
                   <Image
                     src={level.iconSrc}
                     alt={`Icono para ${level.label}`}
