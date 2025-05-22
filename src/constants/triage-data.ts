@@ -24,10 +24,18 @@ export const FEP_LEVELS: FepLevelOption[] = [
     description: 'Evacuación FÁCIL: Puede evacuar con POCA ayuda (de otros enfermos/residentes, familiares, etc.). Uso de bastón, muletas, andador o apoyado, a buen ritmo.', 
     color: 'bg-yellow-400 hover:bg-yellow-500', 
     textColorClassName: 'text-black',
-    iconSrc: 'https://placehold.co/40x32.png', // Replace with your actual image path
+    iconSrc: 'https://placehold.co/40x32.png',
     iconAiHint: 'mobility aids' 
   },
-  { value: 3, label: 'Nivel 3 - Naranja', description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', color: 'bg-orange-500 hover:bg-orange-600', textColorClassName: 'text-black' },
+  { 
+    value: 3, 
+    label: 'Nivel 3 - Naranja', 
+    description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', 
+    color: 'bg-orange-500 hover:bg-orange-600', 
+    textColorClassName: 'text-black',
+    iconSrc: 'https://placehold.co/40x32.png',
+    iconAiHint: 'wheelchair assistance'
+  },
   { value: 4, label: 'Nivel 4 - Rojo', description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', color: 'bg-red-600 hover:bg-red-700', textColorClassName: 'text-white' },
   { value: 5, label: 'Nivel 5 - Azul', description: 'Evacuación MUY DIFÍCIL: Necesita ayuda y soporte del personal del centro (dos o más personas).', color: 'bg-blue-600 hover:bg-blue-700', textColorClassName: 'text-white' },
 ];
