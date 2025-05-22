@@ -1,11 +1,10 @@
+
 'use client';
 
 import type { CceeScore, SelectOption } from '@/types/triage';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { CheckCircle2 } from 'lucide-react';
 
 interface CceeCategoryInputProps {
   id: string;
@@ -13,8 +12,6 @@ interface CceeCategoryInputProps {
   options: SelectOption<CceeScore>[];
   selectedValue: CceeScore | undefined;
   onValueChange: (value: CceeScore) => void;
-  aiSuggestion?: CceeScore;
-  aiReasoning?: string;
   disabled?: boolean;
 }
 
@@ -24,8 +21,6 @@ export function CceeCategoryInput({
   options,
   selectedValue,
   onValueChange,
-  aiSuggestion,
-  aiReasoning,
   disabled = false,
 }: CceeCategoryInputProps) {
   return (
@@ -43,22 +38,6 @@ export function CceeCategoryInput({
             <div className="flex-grow">
               <Label htmlFor={`${id}-${option.value}`} className="font-medium cursor-pointer">
                 {option.label}
-                {aiSuggestion === option.value && (
-                  <TooltipProvider>
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <Badge variant="outline" className="ml-2 border-primary text-primary bg-primary/10">
-                          <AlertCircle className="h-3 w-3 mr-1" />
-                          AI Sugerencia
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs text-sm p-2 bg-popover text-popover-foreground shadow-md rounded-md">
-                        <p className="font-semibold">Razón de la IA:</p>
-                        <p>{aiReasoning || "No se proporcionó razonamiento específico."}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
               </Label>
               <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
             </div>

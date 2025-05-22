@@ -1,18 +1,19 @@
+
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
 import type { CceeFormState, UnitType, CceeScore } from '@/types/triage';
-import type { ExtractPatientDataOutput } from '@/ai/flows/extract-patient-data';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { AiAssistCard } from './ai-assist-card';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import {
+  FEP_LEVELS,
   OXYGEN_NEED_LEVELS,
   VITAL_SIGNS_LEVELS,
   MEDICATION_NUTRITION_LEVELS,
@@ -24,13 +25,6 @@ interface CceeFormProps {
   fepScore: CceeScore;
   formState: CceeFormState;
   setFormState: Dispatch<SetStateAction<CceeFormState>>;
-  aiPatientNotes: string;
-  setAiPatientNotes: Dispatch<SetStateAction<string>>;
-  aiLabResults: string;
-  setAiLabResults: Dispatch<SetStateAction<string>>;
-  aiExtractedData: ExtractPatientDataOutput | null;
-  onExtractDataWithAI: () => Promise<void>;
-  isProcessingAI: boolean;
   onFormComplete: () => void;
   totalCceeScore: number | null;
 }
@@ -39,13 +33,6 @@ export function CceeForm({
   fepScore,
   formState,
   setFormState,
-  aiPatientNotes,
-  setAiPatientNotes,
-  aiLabResults,
-  setAiLabResults,
-  aiExtractedData,
-  onExtractDataWithAI,
-  isProcessingAI,
   onFormComplete,
   totalCceeScore,
 }: CceeFormProps) {
@@ -68,36 +55,31 @@ export function CceeForm({
     );
   };
 
+  const selectedFepInfo = FEP_LEVELS.find(level => level.value === fepScore);
+
   return (
     <Card className="w-full shadow-lg">
-      <CardHeader>
-        <CardTitle className="text-xl">2. Triaje Avanzado (C.C.E.E.)</CardTitle>
-        <CardDescription>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">2. Triaje Avanzado o Secundario (C.C.E.E.)</CardTitle>
+        <CardDescription className="text-center">
           Complete los detalles para calcular la Complejidad de Cuidados de Evacuación y Estancia.
-          El valor F.E.P. seleccionado es: <span className="font-bold text-primary">{fepScore}</span>.
+          <div className="flex flex-col items-center my-4">
+            <span className="text-sm text-muted-foreground mb-1">F.E.P. Seleccionado:</span>
+            {selectedFepInfo && (
+              <div
+                className={cn(
+                  "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-md border-2 border-foreground/20",
+                  selectedFepInfo.color, 
+                  selectedFepInfo.textColorClassName
+                )}
+              >
+                {fepScore}
+              </div>
+            )}
+          </div>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <AiAssistCard
-          patientNotes={aiPatientNotes}
-          setPatientNotes={setAiPatientNotes}
-          labResults={aiLabResults}
-          setLabResults={setAiLabResults}
-          onExtractData={onExtractDataWithAI}
-          isProcessing={isProcessingAI}
-        />
-
-        {aiExtractedData?.reasoning && (
-          <Alert variant="default" className="bg-primary/10 border-primary/30">
-            <Info className="h-4 w-4 text-primary" />
-            <AlertTitle className="text-primary">Información del Asistente IA</AlertTitle>
-            <AlertDescription className="text-sm text-foreground/80">
-              <span className="font-semibold">Resumen del razonamiento de la IA:</span> {aiExtractedData.reasoning}
-              <br/> <strong className="mt-1 block">Por favor, revise y confirme cada campo.</strong>
-            </AlertDescription>
-          </Alert>
-        )}
-
         <Separator />
 
         <CceeCategoryInput
@@ -106,8 +88,6 @@ export function CceeForm({
           options={OXYGEN_NEED_LEVELS}
           selectedValue={formState.oxygenNeed}
           onValueChange={(value) => handleCategoryChange('oxygenNeed', value)}
-          aiSuggestion={aiExtractedData?.oxygenNeed as CceeScore | undefined}
-          aiReasoning={aiExtractedData?.reasoning}
         />
         <Separator />
         <CceeCategoryInput
@@ -116,8 +96,6 @@ export function CceeForm({
           options={VITAL_SIGNS_LEVELS}
           selectedValue={formState.vitalSignsControl}
           onValueChange={(value) => handleCategoryChange('vitalSignsControl', value)}
-          aiSuggestion={aiExtractedData?.vitalSignsControl as CceeScore | undefined}
-          aiReasoning={aiExtractedData?.reasoning}
         />
         <Separator />
         <CceeCategoryInput
@@ -126,8 +104,6 @@ export function CceeForm({
           options={MEDICATION_NUTRITION_LEVELS}
           selectedValue={formState.medicationAndNutrition}
           onValueChange={(value) => handleCategoryChange('medicationAndNutrition', value)}
-          aiSuggestion={aiExtractedData?.medicationAndNutrition as CceeScore | undefined}
-          aiReasoning={aiExtractedData?.reasoning}
         />
         <Separator />
 
@@ -136,8 +112,8 @@ export function CceeForm({
           id="unitType"
           title="E - Tipo de Unidad (para Escala Específica)"
           options={UNIT_TYPES}
-          selectedValue={formState.unitType as CceeScore | undefined} // Cast for RadioGroup, ensure value is stringified if not number
-          onValueChange={(value) => handleUnitTypeChange(value as unknown as UnitType)} // Value from RadioGroup is string
+          selectedValue={formState.unitType as CceeScore | undefined} 
+          onValueChange={(value) => handleUnitTypeChange(value as unknown as UnitType)} 
         />
         
         {formState.unitType && (
@@ -149,8 +125,6 @@ export function CceeForm({
               options={UNIT_SPECIFIC_SCALES[formState.unitType]}
               selectedValue={formState.unitSpecificScale}
               onValueChange={(value) => handleCategoryChange('unitSpecificScale', value)}
-              aiSuggestion={aiExtractedData?.unitSpecificScale as CceeScore | undefined}
-              aiReasoning={aiExtractedData?.reasoning}
             />
           </>
         )}
