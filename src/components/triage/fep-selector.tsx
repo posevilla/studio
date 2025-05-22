@@ -35,7 +35,7 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
             <AccordionContent>
               <div className="relative w-full aspect-[843/799] max-w-lg mx-auto bg-muted/30 rounded-md p-2">
                 <Image
-                  src="https://placehold.co/843x799.png"
+                  src="https://placehold.co/843x799.png" // Consider moving this to public/images and referencing it like /images/fep-flowchart.png
                   alt="Diagrama de flujo para la selección de F.E.P."
                   width={843}
                   height={799}
@@ -51,20 +51,30 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
         </Accordion>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(FEP_LEVELS as FepLevelOption[]).map((level) => (
+          {FEP_LEVELS.map((level) => (
             <Button
               key={level.value}
-              // Removed variant prop to allow full style control via className
               className={cn(
-                "h-auto p-4 flex flex-col items-start text-left whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105 focus:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                level.color, // Applies bg-COLOR and hover:bg-COLOR from constants
-                level.textColorClassName, // Applies text-COLOR from constants
+                "h-auto p-4 flex flex-col items-center text-center whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105 focus:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                level.color, 
+                level.textColorClassName, 
                 selectedFep === level.value
-                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' // Style for selected
-                  : 'border border-border' // Style for unselected
+                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' 
+                  : 'border border-border' 
               )}
               onClick={() => onFepSelect(level.value)}
             >
+              {level.iconSrc && (
+                <div className="relative w-10 h-8 mb-2">
+                  <Image
+                    src={level.iconSrc}
+                    alt={`Icono para ${level.label}`}
+                    layout="fill"
+                    objectFit="contain"
+                    data-ai-hint={level.iconAiHint || "triage icon"}
+                  />
+                </div>
+              )}
               <span className="font-semibold text-lg">{level.label}</span>
               <p className="text-sm mt-1 opacity-80">{level.description}</p>
             </Button>
