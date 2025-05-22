@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, Info, HelpCircle, TrendingUp } from 'lucide-react'; // Added HelpCircle, Info, TrendingUp
+import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity } from 'lucide-react'; // Added Activity
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -84,7 +84,15 @@ export function CceeForm({
 
   const selectedFepInfo = getFepLevelInfo(fepScore);
 
-  const partialSubtotal = useMemo(() => {
+  const subtotalAfterOxygen = useMemo(() => {
+    const { oxygenNeed } = formState;
+    if (fepScore && oxygenNeed) {
+        return fepScore + oxygenNeed;
+    }
+    return null;
+  }, [fepScore, formState.oxygenNeed]);
+
+  const subtotalAfterVitals = useMemo(() => {
     const { oxygenNeed, vitalSignsControl } = formState;
     if (fepScore && oxygenNeed && vitalSignsControl) {
       return fepScore + oxygenNeed + vitalSignsControl;
@@ -162,32 +170,56 @@ export function CceeForm({
           selectedValue={formState.oxygenNeed}
           onValueChange={(value) => handleCategoryChange('oxygenNeed', value)}
         />
-        {formState.oxygenNeed && (oxygenConsumption.needs12h !== null || oxygenConsumption.needs24h !== null) && (
+        {formState.oxygenNeed && (oxygenConsumption.needs12h !== null || oxygenConsumption.needs24h !== null || OXYGEN_NEED_LEVELS.find(o => o.value === formState.oxygenNeed)?.litersPer24h === 0) && (
           <Alert variant="default" className="mt-4">
             <Info className="h-5 w-5" />
             <AlertTitle className="font-semibold">Información Adicional sobre Necesidad de Oxígeno</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pl-5 mt-1 space-y-1">
                 <li>Puntuación C.C.E.E. para Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
-                {oxygenConsumption.needs12h !== null && (
+                {oxygenConsumption.needs12h !== null && oxygenConsumption.needs12h > 0 && (
                   <li>Previsión para 12 horas: <span className="font-medium">{oxygenConsumption.needs12h.toLocaleString()}</span> litros (aprox.)</li>
                 )}
-                {oxygenConsumption.needs24h !== null && (
+                {oxygenConsumption.needs24h !== null && oxygenConsumption.needs24h > 0 && (
                   <li>Previsión para 24 horas: <span className="font-medium">{oxygenConsumption.needs24h.toLocaleString()}</span> litros (aprox.)</li>
                 )}
               </ul>
-              { (oxygenConsumption.needs12h === null || oxygenConsumption.needs24h === null) && formState.oxygenNeed && OXYGEN_NEED_LEVELS.find(o => o.value === formState.oxygenNeed)?.litersPer24h === 0 && (
-                <p className="text-xs text-muted-foreground mt-2">
+              { (oxygenConsumption.needs12h === 0 || oxygenConsumption.needs24h === 0) && formState.oxygenNeed && OXYGEN_NEED_LEVELS.find(o => o.value === formState.oxygenNeed)?.litersPer24h === 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
                   No se requiere previsión de litros para el nivel seleccionado.
                 </p>
               )}
-              { (oxygenConsumption.needs12h !== null || oxygenConsumption.needs24h !== null) && (
+              { (oxygenConsumption.needs12h !== null && oxygenConsumption.needs12h > 0 || oxygenConsumption.needs24h !== null && oxygenConsumption.needs24h > 0) && (
                 <p className="text-xs text-muted-foreground mt-2">
                   Estos cálculos son una estimación basada en el nivel seleccionado.
                 </p>
               )}
             </AlertDescription>
           </Alert>
+        )}
+
+        {subtotalAfterOxygen !== null && selectedFepInfo && formState.oxygenNeed && (
+            <Alert variant="default" className="mt-4 bg-purple-500/10 border-purple-500/30 text-purple-700 dark:text-purple-400">
+                <Activity className="h-5 w-5 text-purple-600 dark:text-purple-500" />
+                <AlertTitle className="font-bold text-purple-700 dark:text-purple-500">Subtotal Parcial (A+B)</AlertTitle>
+                <AlertDescription>
+                    <ul className="list-none mt-1 space-y-1 text-sm">
+                        <li>
+                            A. F.E.P.: <span className="font-medium">{fepScore}</span>
+                            <span
+                                className={cn(
+                                    "inline-block w-3 h-3 rounded-full ml-2 border",
+                                    selectedFepInfo.bgColorClassName,
+                                    selectedFepInfo.textColorClassName === 'text-black' || selectedFepInfo.textColorClassName === 'text-gray-800' ? 'border-black/20' : 'border-white/20' 
+                                )}
+                                title={`Prioridad F.E.P.: ${selectedFepInfo.label}`}
+                            ></span>
+                        </li>
+                        <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
+                        <li className="font-semibold pt-1">Suma (A+B): <span className="text-lg font-bold">{subtotalAfterOxygen}</span></li>
+                    </ul>
+                </AlertDescription>
+            </Alert>
         )}
 
 
@@ -200,16 +232,16 @@ export function CceeForm({
           onValueChange={(value) => handleCategoryChange('vitalSignsControl', value)}
         />
         
-        {partialSubtotal !== null && (
+        {subtotalAfterVitals !== null && formState.vitalSignsControl && (
           <Alert variant="default" className="mt-4 bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-400">
             <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-            <AlertTitle className="font-bold text-blue-700 dark:text-blue-500">Subtotal C.C.E.E. Parcial</AlertTitle>
+            <AlertTitle className="font-bold text-blue-700 dark:text-blue-500">Subtotal Parcial (A+B+C)</AlertTitle>
             <AlertDescription>
               <ul className="list-none mt-1 space-y-1 text-sm">
                 <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
                 <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
                 <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>
-                <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{partialSubtotal}</span></li>
+                <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{subtotalAfterVitals}</span></li>
               </ul>
             </AlertDescription>
           </Alert>
