@@ -2,7 +2,7 @@
 'use client';
 
 import type { CceeScore } from '@/types/triage';
-import { FEP_LEVELS } from '@/constants/triage-data';
+import { FEP_LEVELS, type FepLevelOption } from '@/constants/triage-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -51,19 +51,22 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
         </Accordion>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {FEP_LEVELS.map((level) => (
+          {(FEP_LEVELS as FepLevelOption[]).map((level) => (
             <Button
               key={level.value}
-              variant={selectedFep === level.value ? 'default' : 'outline'}
+              // Removed variant prop to allow full style control via className
               className={cn(
-                "h-auto p-4 flex flex-col items-start text-left whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105",
-                selectedFep === level.value ? level.color : 'border-border hover:bg-accent/50',
-                selectedFep === level.value && level.value === 2 ? 'text-black hover:text-black' : (selectedFep === level.value ? 'text-primary-foreground hover:text-primary-foreground' : 'text-foreground')
+                "h-auto p-4 flex flex-col items-start text-left whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105 focus:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
+                level.color, // Applies bg-COLOR and hover:bg-COLOR from constants
+                level.textColorClassName, // Applies text-COLOR from constants
+                selectedFep === level.value
+                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' // Style for selected
+                  : 'border border-border' // Style for unselected
               )}
               onClick={() => onFepSelect(level.value)}
             >
-              <span className={cn("font-semibold text-lg", selectedFep === level.value && level.value !== 2 ? 'text-primary-foreground' : (selectedFep === level.value && level.value === 2 ? 'text-black' : 'text-primary'))}>{level.label}</span>
-              <p className={cn("text-sm mt-1", selectedFep === level.value ? (level.value === 2 ? 'text-muted-foreground' : 'text-primary-foreground/80') : 'text-muted-foreground')}>{level.description}</p>
+              <span className="font-semibold text-lg">{level.label}</span>
+              <p className="text-sm mt-1 opacity-80">{level.description}</p>
             </Button>
           ))}
         </div>

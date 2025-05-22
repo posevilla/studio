@@ -1,11 +1,16 @@
 import type { SelectOption, UnitType, ResourceRecommendation, CceeScore } from '@/types/triage';
 
-export const FEP_LEVELS: SelectOption<CceeScore>[] = [
-  { value: 1, label: 'Nivel 1 - Verde', description: 'Evacuación MUY FÁCIL: Puede evacuar él solo (sin ayuda de ningún tipo).', color: 'bg-green-500 hover:bg-green-600' },
-  { value: 2, label: 'Nivel 2 - Amarillo', description: 'Evacuación FÁCIL: Puede evacuar con POCA ayuda (de otros enfermos/residentes, familiares, etc.). Uso de bastón, muletas, andador o apoyado, a buen ritmo.', color: 'bg-yellow-400 hover:bg-yellow-500 text-black' },
-  { value: 3, label: 'Nivel 3 - Naranja', description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', color: 'bg-orange-500 hover:bg-orange-600' },
-  { value: 4, label: 'Nivel 4 - Rojo', description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', color: 'bg-red-600 hover:bg-red-700' },
-  { value: 5, label: 'Nivel 5 - Azul', description: 'Evacuación MUY DIFÍCIL: Necesita ayuda y soporte del personal del centro (dos o más personas).', color: 'bg-blue-600 hover:bg-blue-700' },
+// Extend SelectOption for FEP_LEVELS to include textColorClassName
+export interface FepLevelOption extends SelectOption<CceeScore> {
+  textColorClassName: string;
+}
+
+export const FEP_LEVELS: FepLevelOption[] = [
+  { value: 1, label: 'Nivel 1 - Verde', description: 'Evacuación MUY FÁCIL: Puede evacuar él solo (sin ayuda de ningún tipo).', color: 'bg-green-500 hover:bg-green-600', textColorClassName: 'text-black' },
+  { value: 2, label: 'Nivel 2 - Amarillo', description: 'Evacuación FÁCIL: Puede evacuar con POCA ayuda (de otros enfermos/residentes, familiares, etc.). Uso de bastón, muletas, andador o apoyado, a buen ritmo.', color: 'bg-yellow-400 hover:bg-yellow-500', textColorClassName: 'text-black' },
+  { value: 3, label: 'Nivel 3 - Naranja', description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', color: 'bg-orange-500 hover:bg-orange-600', textColorClassName: 'text-black' },
+  { value: 4, label: 'Nivel 4 - Rojo', description: 'Evacuación DIFÍCIL: Necesita ayuda del personal del centro (una persona).', color: 'bg-red-600 hover:bg-red-700', textColorClassName: 'text-white' },
+  { value: 5, label: 'Nivel 5 - Azul', description: 'Evacuación MUY DIFÍCIL: Necesita ayuda y soporte del personal del centro (dos o más personas).', color: 'bg-blue-600 hover:bg-blue-700', textColorClassName: 'text-white' },
 ];
 
 export const OXYGEN_NEED_LEVELS: SelectOption<CceeScore>[] = [
