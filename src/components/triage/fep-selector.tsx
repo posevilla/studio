@@ -54,14 +54,15 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
           {FEP_LEVELS.map((level) => (
             <Button
               key={level.value}
+              variant="outline" // Use outline variant as a base
               className={cn(
                 "h-auto p-4 flex flex-col items-center text-center whitespace-normal transition-all duration-150 ease-in-out transform hover:scale-105 focus:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                level.color, 
-                level.textColorClassName, 
+                level.color, // This will apply bg-LEVEL_COLOR and hover:bg-LEVEL_COLOR_HOVER
+                level.textColorClassName, // This will apply text-LEVEL_TEXT_COLOR
                 selectedFep === level.value
-                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg' 
-                  : 'border border-border',
-                level.value === 5 && (FEP_LEVELS.length % 2 !== 0 || FEP_LEVELS.length % 3 !== 0) ? 'md:col-span-2 lg:col-span-3' : '' 
+                  ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg border-foreground/50' // Selected: add ring and slightly darker border
+                  : 'border-border', // Unselected: ensure our standard border color is used (overwrites border-input from outline variant if different)
+                level.value === 5 && (FEP_LEVELS.length % 2 !== 0 || FEP_LEVELS.length % 3 !== 0) ? 'md:col-span-2 lg:col-span-3 lg:mx-auto md:max-w-xs' : ''
               )}
               onClick={() => onFepSelect(level.value)}
             >
