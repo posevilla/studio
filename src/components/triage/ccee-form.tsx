@@ -2,7 +2,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import type { CceeFormState, UnitType, CceeScore, OxygenNeedLevelOption } from '@/types/triage';
 
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, Info, HelpCircle } from 'lucide-react'; // Added HelpCircle, kept Info
+import { ShieldCheck, Info, HelpCircle, TrendingUp } from 'lucide-react'; // Added HelpCircle, Info, TrendingUp
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -83,6 +83,14 @@ export function CceeForm({
   };
 
   const selectedFepInfo = getFepLevelInfo(fepScore);
+
+  const partialSubtotal = useMemo(() => {
+    const { oxygenNeed, vitalSignsControl } = formState;
+    if (fepScore && oxygenNeed && vitalSignsControl) {
+      return fepScore + oxygenNeed + vitalSignsControl;
+    }
+    return null;
+  }, [fepScore, formState.oxygenNeed, formState.vitalSignsControl]);
 
   return (
     <Card className="w-full shadow-lg">
@@ -191,6 +199,22 @@ export function CceeForm({
           selectedValue={formState.vitalSignsControl}
           onValueChange={(value) => handleCategoryChange('vitalSignsControl', value)}
         />
+        
+        {partialSubtotal !== null && (
+          <Alert variant="default" className="mt-4 bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-400">
+            <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+            <AlertTitle className="font-bold text-blue-700 dark:text-blue-500">Subtotal C.C.E.E. Parcial</AlertTitle>
+            <AlertDescription>
+              <ul className="list-none mt-1 space-y-1 text-sm">
+                <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
+                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
+                <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>
+                <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{partialSubtotal}</span></li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Separator />
         <CceeCategoryInput
           id="medicationAndNutrition"
@@ -246,3 +270,4 @@ export function CceeForm({
     </Card>
   );
 }
+
