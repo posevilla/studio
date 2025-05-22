@@ -1,5 +1,7 @@
+
 import Link from 'next/link';
 import { SitecsLogo } from '@/components/icons/sitecs-logo';
+import { DarkModeToggle } from './dark-mode-toggle';
 
 export function AppHeader() {
   return (
@@ -11,6 +13,9 @@ export function AppHeader() {
             S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda
           </span>
         </Link>
+        <div className="ml-auto flex items-center">
+          <DarkModeToggle />
+        </div>
       </div>
     </header>
   );
