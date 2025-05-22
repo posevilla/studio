@@ -260,7 +260,8 @@ export default function TriagePage() {
         </div>
       </main>
       <footer className="py-6 text-center text-sm text-muted-foreground border-t">
-        S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda &copy; {new Date().getFullYear()}
+        <p>S.I.T.E.C.S Sistema Integral de Triaje para Evacuación de Centros Sanitarios - Aplicación de Ayuda &copy; {new Date().getFullYear()}</p>
+        <p className="text-xs mt-1">Pedro Omar Sevilla Moreno - ENFERMERO</p>
       </footer>
 
       <CameraView 
