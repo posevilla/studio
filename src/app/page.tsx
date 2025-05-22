@@ -214,14 +214,14 @@ export default function TriagePage() {
                   type="text"
                   value={patientId}
                   onChange={(e) => setPatientId(e.target.value)}
-                  placeholder="Ej: 12345 / Cama 10A"
+                  placeholder="Ej: 12345 / Cama 10A / NHC"
                   className="text-center"
                 />
               </div>
               <Button variant="outline" onClick={handleOpenCamera} className="w-full max-w-xs sm:max-w-sm py-2 px-4 h-auto">
                 <div className="flex flex-col items-center gap-1">
                   <Camera className="h-5 w-5" />
-                  <span>Abrir Cámara</span>
+                  <span>Abrir Cámara / Leer código de barras / QR</span>
                 </div>
               </Button>
             </CardContent>
