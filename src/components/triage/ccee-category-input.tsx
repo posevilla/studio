@@ -33,13 +33,13 @@ export function CceeCategoryInput({
         disabled={disabled}
       >
         {options.map((option) => (
-          <div key={option.value} className="flex items-start space-x-3 p-3 border rounded-md hover:bg-accent/20 transition-colors">
+          <div key={option.value} className="flex items-start space-x-3 p-2 border rounded-md hover:bg-accent/20 transition-colors">
             <RadioGroupItem value={option.value.toString()} id={`${id}-${option.value}`} className="mt-1 shrink-0" />
             <div className="flex-grow">
               <Label htmlFor={`${id}-${option.value}`} className="font-medium cursor-pointer">
                 {option.label}
               </Label>
-              <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
+              <p className="text-xs text-muted-foreground mt-0.5 whitespace-pre-line">{option.description}</p>
             </div>
             {selectedValue === option.value && (
                <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />

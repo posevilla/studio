@@ -2,15 +2,16 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import type { CceeFormState, UnitType, CceeScore } from '@/types/triage';
+import type { CceeFormState, UnitType, CceeScore, OxygenNeedLevelOption } from '@/types/triage';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/accordion";
 
 import {
-  getFepLevelInfo, // Import the helper
+  getFepLevelInfo,
   OXYGEN_NEED_LEVELS,
   VITAL_SIGNS_LEVELS,
   MEDICATION_NUTRITION_LEVELS,
@@ -46,6 +47,23 @@ export function CceeForm({
   capturedImage,
 }: CceeFormProps) {
   
+  const [oxygenConsumption, setOxygenConsumption] = useState<{ needs12h: number | null, needs24h: number | null }>({ needs12h: null, needs24h: null });
+
+  useEffect(() => {
+    if (formState.oxygenNeed) {
+      const selectedOxygenLevel = OXYGEN_NEED_LEVELS.find(level => level.value === formState.oxygenNeed) as OxygenNeedLevelOption | undefined;
+      if (selectedOxygenLevel && selectedOxygenLevel.litersPer24h !== undefined) {
+        const needs24h = selectedOxygenLevel.litersPer24h;
+        const needs12h = needs24h / 2;
+        setOxygenConsumption({ needs12h, needs24h });
+      } else {
+        setOxygenConsumption({ needs12h: null, needs24h: null });
+      }
+    } else {
+      setOxygenConsumption({ needs12h: null, needs24h: null });
+    }
+  }, [formState.oxygenNeed]);
+
   const handleCategoryChange = (category: keyof Omit<CceeFormState, 'fep' | 'unitType'>, value: CceeScore) => {
     setFormState((prev) => ({ ...prev, [category]: value }));
   };
@@ -136,6 +154,22 @@ export function CceeForm({
           selectedValue={formState.oxygenNeed}
           onValueChange={(value) => handleCategoryChange('oxygenNeed', value)}
         />
+        {oxygenConsumption.needs12h !== null && oxygenConsumption.needs24h !== null && formState.oxygenNeed && (
+          <Alert variant="default" className="mt-4">
+            <Info className="h-5 w-5" />
+            <AlertTitle className="font-semibold">Previsión de Necesidades de Oxígeno (aprox.)</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc pl-5 mt-1 space-y-1">
+                <li>Para 12 horas: <span className="font-medium">{oxygenConsumption.needs12h.toLocaleString()}</span> litros</li>
+                <li>Para 24 horas: <span className="font-medium">{oxygenConsumption.needs24h.toLocaleString()}</span> litros</li>
+              </ul>
+              <p className="text-xs text-muted-foreground mt-2">
+                Estos cálculos son una estimación basada en el nivel seleccionado.
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Separator />
         <CceeCategoryInput
           id="vitalSignsControl"

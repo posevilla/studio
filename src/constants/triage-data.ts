@@ -1,5 +1,5 @@
 
-import type { SelectOption, UnitType, ResourceRecommendation, CceeScore } from '@/types/triage';
+import type { SelectOption, UnitType, ResourceRecommendation, CceeScore, OxygenNeedLevelOption } from '@/types/triage';
 
 // Extend SelectOption for FEP_LEVELS to include textColorClassName, iconSrc, and iconAiHint
 export interface FepLevelOption extends SelectOption<CceeScore> {
@@ -17,7 +17,7 @@ export const FEP_LEVELS: FepLevelOption[] = [
     description: 'Evacuación MUY FÁCIL: Puede evacuar él solo (sin ayuda de ningún tipo).', 
     bgColorClassName: 'bg-green-500',
     hoverBgColorClassName: 'hover:bg-green-600',
-    textColorClassName: 'text-black dark:text-white', // Adjusted for dark mode
+    textColorClassName: 'text-black dark:text-white',
     iconSrc: '/images/fep-level-1.png', 
     iconAiHint: 'stick figure evacuation' 
   },
@@ -27,7 +27,7 @@ export const FEP_LEVELS: FepLevelOption[] = [
     description: 'Evacuación FÁCIL: Puede evacuar con POCA ayuda (de otros enfermos/residentes, familiares, etc.). Uso de bastón, muletas, andador o apoyado, a buen ritmo.', 
     bgColorClassName: 'bg-yellow-400',
     hoverBgColorClassName: 'hover:bg-yellow-500',
-    textColorClassName: 'text-black dark:text-gray-800', // Adjusted for dark mode
+    textColorClassName: 'text-black dark:text-gray-800',
     iconSrc: '/images/fep-level-2.png',
     iconAiHint: 'mobility aids' 
   },
@@ -37,7 +37,7 @@ export const FEP_LEVELS: FepLevelOption[] = [
     description: 'Evacuación COMPLICADA: Necesita ayuda. Uso de bastón, muletas, andador o apoyado, pero NO a buen ritmo, o silla de ruedas autónoma/ayudada (no personal centro).', 
     bgColorClassName: 'bg-orange-500',
     hoverBgColorClassName: 'hover:bg-orange-600',
-    textColorClassName: 'text-black dark:text-white', // Adjusted for dark mode
+    textColorClassName: 'text-black dark:text-white',
     iconSrc: '/images/fep-level-3.png',
     iconAiHint: 'wheelchair assistance'
   },
@@ -63,12 +63,37 @@ export const FEP_LEVELS: FepLevelOption[] = [
   },
 ];
 
-export const OXYGEN_NEED_LEVELS: SelectOption<CceeScore>[] = [
-  { value: 1, label: 'No Precisa', description: 'Respiración eupneica, no requiere O2.' },
-  { value: 2, label: 'NEB Pautadas', description: 'Nebulizaciones/aerosoles pautados, O2 por periodos limitados.' },
-  { value: 3, label: 'Oxígeno Bajo Caudal', description: 'Aporte continuo de O2 a bajo caudal (≤7 l.p.m.).' },
-  { value: 4, label: 'Oxígeno Alto Caudal', description: 'Aporte continuo de O2 a alto caudal (7-15 l.p.m.). CPAP nocturno.' },
-  { value: 5, label: 'Ventilación Mecánica', description: 'VM invasiva o no invasiva permanente. Necesita respirador/Ambu.' },
+export const OXYGEN_NEED_LEVELS: OxygenNeedLevelOption[] = [
+  { 
+    value: 1, 
+    label: 'No Precisa', 
+    description: 'No Precisa, respiración eupneica o que no requiere oxigeno medicinal - O2.',
+    litersPer24h: 0
+  },
+  { 
+    value: 2, 
+    label: 'NEB Pautadas', 
+    description: 'Tratamiento con nebulizaciones o aerosoles, de forma pautada, por lo que necesitará oxígeno por periodos de tiempo limitado, al recibir tratamiento.\nCálculo de la Previsión necesidades de oxígeno para 24 horas: Una nebulización con oxígeno (las de aire precisarían balas de aire comprimido, menos abundantes en el entorno hospitalario, o tomas de pared de aire y/o aparato nebulizador enchufado a corriente eléctrica), requiere un caudal mínimo de 6 l/min de oxígeno medicinal, durante 10 a 15 minutos, lo que nos deja un consumo de oxígeno de (6 l/min. X 15 min.=) 90 litros, para 4 nebulizaciones cada 24 horas (pauta c/8h y una extra de rescate, o c/6h), por lo que nos deja un gasto de (90 litros/NEB x 4 NEB =) 360 litros/24h, luego necesitaremos al menos una bala de 2 litros a 200 bares (= 400 litros) para ese paciente.',
+    litersPer24h: 360
+  },
+  { 
+    value: 3, 
+    label: 'Oxígeno Bajo Caudal', 
+    description: 'El enfermo necesita aporte de oxígeno medicinal de forma continua, a bajo caudal, por gafas nasales o mascarilla tipo venturi, a 7 litros por minutos (l.p.m) o menos.\nPrevisión necesidades de oxígeno para 24 horas: (7 l/min. X 60 min.= 420 litros a la hora), para oxigenoterapia las 24 h (420 litros/h x 24h =) 10.080 litros/24h, por lo que necesitaremos al menos una bala de 50 litros a 200 bares (= 10000 litros) para ese paciente*2.',
+    litersPer24h: 10080
+  },
+  { 
+    value: 4, 
+    label: 'Oxígeno Alto Caudal', 
+    description: 'El enfermo precisa aporte de oxígeno continuamente, a alto caudal, por mascarilla venturi o de reservorio, de 7 a 15 l.p.m. Pacientes con C.P.A.P nocturno.\nPrevisión necesidades de oxígeno para 24 horas: (15 l/min. X 60 min.= 900 litros a la hora), para oxigenoterapia las 24 h (900 litros/h x 24h =) 21.600 litros/24h, por lo que necesitaremos al menos DOS balas de 50 litros a 200 bares (= 20000 litros) para ese paciente*2.',
+    litersPer24h: 21600
+  },
+  { 
+    value: 5, 
+    label: 'Ventilación Mecánica', 
+    description: 'Pacientes con intubación oro o naso traqueal y/o con ventilación mecánica NO invasiva de forma permanente. Necesitan respirador/ventilador o soporte respiratorio con bolsa de reanimación tipo Ambu © y oxígeno a alto flujo y caudal.\nPrevisión necesidades de oxígeno para 24 horas: para un paciente estándar, con FiO2 al 100% (No Air Mix), el volumen minuto de gas que como máximo necesitará el paciente será de 20 l/min (oxígeno puro) (20 l/min. X 60 min.= 1200 litros a la hora), para oxigenoterapia las 24 h (1200 litros/h x 24h =) 28.800 litros/24h, por lo que necesitaremos al menos TRES balas de 50 litros a 200 bares (= 30000 litros) para ese paciente.',
+    litersPer24h: 28800
+  },
 ];
 
 export const VITAL_SIGNS_LEVELS: SelectOption<CceeScore>[] = [

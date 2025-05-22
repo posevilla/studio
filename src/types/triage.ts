@@ -1,9 +1,15 @@
+
 export interface SelectOption<T = number | string> {
   value: T;
   label: string;
   description: string;
   color?: string; // For FEP levels
   detailedDescription?: string | React.ReactNode; // For more complex descriptions
+}
+
+// Specific type for oxygen need levels to include litersPer24h
+export interface OxygenNeedLevelOption extends SelectOption<CceeScore> {
+  litersPer24h: number;
 }
 
 export type FepLevel = 1 | 2 | 3 | 4 | 5;
