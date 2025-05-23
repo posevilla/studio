@@ -320,7 +320,7 @@ export function CceeForm({
           <Label htmlFor="unitTypeSelect" className="text-md font-semibold text-foreground">E - Tipo de Unidad (para Escala Específica)</Label>
           <Select
             value={formState.unitType}
-            onValueChange={(value: UnitType | undefined) => { // Allow undefined for reset if needed, or ensure a valid UnitType
+            onValueChange={(value: UnitType | undefined) => { 
               if (value) {
                  handleUnitTypeChange(value);
               }
@@ -342,13 +342,39 @@ export function CceeForm({
         {formState.unitType && (
           <>
             <Separator />
-            <CceeCategoryInput<CceeScore>
-              id="unitSpecificScale"
-              title={`E - Escala Específica para: ${UNIT_TYPES.find(ut => ut.value === formState.unitType)?.label || ''}`}
-              options={UNIT_SPECIFIC_SCALES[formState.unitType]}
-              selectedValue={formState.unitSpecificScale}
-              onValueChange={handleUnitSpecificScaleChange}
-            />
+            <div className="space-y-3">
+                <CceeCategoryInput<CceeScore>
+                  id="unitSpecificScale"
+                  title={`E - Escala Específica para: ${UNIT_TYPES.find(ut => ut.value === formState.unitType)?.label || ''}`}
+                  options={UNIT_SPECIFIC_SCALES[formState.unitType]}
+                  selectedValue={formState.unitSpecificScale}
+                  onValueChange={handleUnitSpecificScaleChange}
+                />
+                {formState.unitType === 'icu' && (
+                  <Accordion type="single" collapsible className="w-full mt-3 pl-2">
+                    <AccordionItem value="sofa-scale-reference-image">
+                      <AccordionTrigger className="text-xs hover:no-underline py-2">
+                        Ver Tabla de Escala SOFA de Referencia
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="relative w-full aspect-[700/350] max-w-md mx-auto bg-muted/30 rounded-md p-1">
+                          <Image
+                            src="/images/escala-sofa.png" 
+                            alt="Imagen de referencia para Escala SOFA"
+                            width={700} 
+                            height={350}
+                            className="rounded-md object-contain"
+                            data-ai-hint="SOFA scale chart"
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 text-center">
+                          Esta es una imagen de ejemplo. Reemplácela con su imagen de referencia de la Escala SOFA.
+                        </p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                )}
+            </div>
           </>
         )}
         
