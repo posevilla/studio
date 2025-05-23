@@ -2,7 +2,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image'; // Import next/image
+import Image from 'next/image';
+import Link from 'next/link';
 import { AppHeader } from '@/components/layout/app-header';
 import { FepSelector } from '@/components/triage/fep-selector';
 import { CceeForm } from '@/components/triage/ccee-form';
@@ -14,9 +15,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { RotateCcw, Camera, History } from 'lucide-react';
+import { RotateCcw, Camera, History, BookMarked } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import type { CceeFormState, CceeScore } from '@/types/triage';
+import type { CceeFormState, CceeScore, TriagedPatient, FepLevel } from '@/types/triage';
+import { addTriagedPatient } from '@/lib/triage-history-store';
 
 
 const initialCceeFormState: CceeFormState = {
@@ -60,20 +62,20 @@ export default function TriagePage() {
   useEffect(() => {
     if (selectedFep) {
       setCceeFormState(prev => ({ ...prev, fep: selectedFep }));
-      if (currentStep === 1 && cceeFormState.fep !== selectedFep) { // Only auto-advance if we are in step 1 AND FEP actually changed
+      if (currentStep === 1 && cceeFormState.fep !== selectedFep) { 
         setCurrentStep(2); 
       }
     }
   }, [selectedFep, currentStep, cceeFormState.fep]);
   
   const calculateTotalCceeScore = useCallback(() => {
-    const { fep, oxygenNeed, vitalSignsControl, medicationAndNutrition, unitType, unitSpecificScale } = cceeFormState;
+    const { fep, oxygenNeed, vitalSignsControl, medicationAndNutrition, unitSpecificScale } = cceeFormState;
     if (
       fep &&
       oxygenNeed &&
       vitalSignsControl &&
       medicationAndNutrition &&
-      unitType && 
+      // unitType is not needed for calculation, only for scale selection
       unitSpecificScale
     ) {
       const score =
@@ -101,6 +103,25 @@ export default function TriagePage() {
         title: "C.C.E.E. Calculado",
         description: `Puntuación total: ${score}. Mostrando recomendación de recursos.`,
       });
+
+      // Save to history store
+      if (cceeFormState.fep !== undefined) { // Ensure FEP is selected
+        const triagedPatientData: TriagedPatient = {
+          triagedEntryId: Date.now().toString(),
+          patientId: patientId || 'N/A', // Use entered patientId or 'N/A'
+          capturedImage,
+          fepScore: cceeFormState.fep as FepLevel, // selectedFep should be CceeScore which is FepLevel
+          cceeFormState: { ...cceeFormState }, // Make a copy
+          totalCceeScore: score,
+          timestamp: Date.now(),
+        };
+        addTriagedPatient(triagedPatientData);
+        toast({
+          title: "Paciente Guardado en Historial",
+          description: `El triaje para ${triagedPatientData.patientId} ha sido guardado en el historial de esta sesión.`,
+        });
+      }
+
     } else {
        toast({
         title: "Formulario Incompleto",
@@ -148,7 +169,6 @@ export default function TriagePage() {
     
     console.log(`Simulating retrieval for patient ID: ${retrievePatientIdInput}`);
     
-    // --- Simulation Logic ---
     let retrievedFep: CceeScore | undefined = undefined;
     let patientFound = false;
 
@@ -162,7 +182,7 @@ export default function TriagePage() {
       });
     } else if (retrievePatientIdInput.toUpperCase() === "NOFEP-456") {
       setPatientId("NOFEP-456");
-      retrievedFep = undefined; // Patient exists but no FEP done
+      retrievedFep = undefined; 
       patientFound = true;
       toast({
         title: "Paciente Encontrado (Sin F.E.P.)",
@@ -178,20 +198,18 @@ export default function TriagePage() {
 
     if (patientFound) {
       setSelectedFep(retrievedFep);
-      setCapturedImage(null); // Clear any existing captured image from previous patient
-      setCceeFormState(prev => ({ // Reset CCEE form fields, but keep new FEP
+      setCapturedImage(null); 
+      setCceeFormState(prev => ({ 
         ...initialCceeFormState,
         fep: retrievedFep,
       }));
-      setTotalCceeScore(null); // Recalculate CCEE
+      setTotalCceeScore(null); 
       if (retrievedFep) {
-        setCurrentStep(2); // Move to CCEE form if FEP was retrieved
+        setCurrentStep(2); 
       } else {
-        setCurrentStep(1); // Stay on FEP selection if no FEP was retrieved
+        setCurrentStep(1); 
       }
     }
-    // --- End Simulation Logic ---
-
     handleCloseRetrieveDialog();
   };
 
@@ -255,6 +273,12 @@ export default function TriagePage() {
               <History className="mr-2 h-5 w-5" />
               Recuperar Paciente Triado
             </Button>
+            <Link href="/history" passHref legacyBehavior>
+              <Button variant="outline" className="text-lg py-3 px-6 w-full sm:w-auto">
+                <BookMarked className="mr-2 h-5 w-5" />
+                Acceder a Pacientes Clasificados
+              </Button>
+            </Link>
           </div>
 
         </div>

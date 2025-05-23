@@ -46,3 +46,14 @@ export interface ResourceRecommendation {
   crew: string;
   scoreRange: string;
 }
+
+export interface TriagedPatient {
+  // A unique ID for this specific triage entry, can be a timestamp string or similar
+  triagedEntryId: string; 
+  patientId: string; // The ID input by the user (e.g., bed number, NHC)
+  capturedImage: string | null;
+  fepScore: FepLevel | undefined;
+  cceeFormState: CceeFormState; // Contains all individual CCEE scores selected
+  totalCceeScore: number | null;
+  timestamp: number; // Unix timestamp (Date.now()) for when the triage was completed
+}
