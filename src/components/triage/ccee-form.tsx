@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity } from 'lucide-react';
+import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -99,6 +99,14 @@ export function CceeForm({
     }
     return null;
   }, [fepScore, formState.oxygenNeed, formState.vitalSignsControl]);
+
+  const subtotalAfterMedication = useMemo(() => {
+    const { oxygenNeed, vitalSignsControl, medicationAndNutrition } = formState;
+    if (fepScore && oxygenNeed && vitalSignsControl && medicationAndNutrition) {
+      return fepScore + oxygenNeed + vitalSignsControl + medicationAndNutrition;
+    }
+    return null;
+  }, [fepScore, formState.oxygenNeed, formState.vitalSignsControl, formState.medicationAndNutrition]);
 
   return (
     <Card className="w-full shadow-lg">
@@ -277,6 +285,23 @@ export function CceeForm({
           selectedValue={formState.medicationAndNutrition}
           onValueChange={(value) => handleCategoryChange('medicationAndNutrition', value)}
         />
+
+        {subtotalAfterMedication !== null && formState.medicationAndNutrition && (
+          <Alert variant="default" className="mt-4 bg-cyan-500/10 border-cyan-500/30 text-cyan-700 dark:text-cyan-400">
+            <ListChecks className="h-5 w-5 text-cyan-600 dark:text-cyan-500" />
+            <AlertTitle className="font-bold text-cyan-700 dark:text-cyan-500">Subtotal Parcial (A+B+C+D)</AlertTitle>
+            <AlertDescription>
+              <ul className="list-none mt-1 space-y-1 text-sm">
+                <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
+                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
+                <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>
+                <li>D. Medicación y Nutrición: <span className="font-medium">{formState.medicationAndNutrition}</span></li>
+                <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{subtotalAfterMedication}</span></li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <Separator />
 
         <CceeCategoryInput
