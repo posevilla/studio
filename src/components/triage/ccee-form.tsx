@@ -221,18 +221,18 @@ export function CceeForm({
                     Ver imagen de referencia adicional sobre oxígeno
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="relative w-full aspect-[600/400] max-w-md mx-auto bg-muted/30 rounded-md p-1">
+                    <div className="relative w-full aspect-[1021/303] max-w-xl mx-auto bg-muted/30 rounded-md p-1">
                       <Image
-                        src="/images/oxygen-needs-reference.png" 
-                        alt="Imagen de referencia para necesidades de oxígeno"
-                        width={600}
-                        height={400}
+                        src="/images/ccee-prevision-necesidades-oxigeno.png" 
+                        alt="Tabla de previsión de necesidades de oxígeno C.C.E.E."
+                        width={1021}
+                        height={303}
                         className="rounded-md object-contain"
-                        data-ai-hint="oxygen chart"
+                        data-ai-hint="oxygen needs table"
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 text-center">
-                      Esta es una imagen de ejemplo. Reemplácela con su imagen de referencia.
+                      Tabla de referencia para previsión de necesidades de oxígeno.
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -422,3 +422,4 @@ export function CceeForm({
     </Card>
   );
 }
+
