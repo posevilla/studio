@@ -64,8 +64,12 @@ export function CceeForm({
     }
   }, [formState.oxygenNeed]);
 
-  const handleCategoryChange = (category: keyof Omit<CceeFormState, 'fep' | 'unitType'>, value: CceeScore) => {
+  const handleCategoryChange = (category: keyof Omit<CceeFormState, 'fep' | 'unitType' | 'unitSpecificScale'>, value: CceeScore) => {
     setFormState((prev) => ({ ...prev, [category]: value }));
+  };
+  
+  const handleUnitSpecificScaleChange = (value: CceeScore) => {
+    setFormState((prev) => ({ ...prev, unitSpecificScale: value }));
   };
 
   const handleUnitTypeChange = (value: UnitType) => {
@@ -171,7 +175,7 @@ export function CceeForm({
       <CardContent className="space-y-6">
         <Separator />
 
-        <CceeCategoryInput
+        <CceeCategoryInput<CceeScore>
           id="oxygenNeed"
           title="B - Necesidad de Oxígeno"
           options={OXYGEN_NEED_LEVELS}
@@ -254,7 +258,7 @@ export function CceeForm({
 
 
         <Separator />
-        <CceeCategoryInput
+        <CceeCategoryInput<CceeScore>
           id="vitalSignsControl"
           title="C - Control de Constantes Vitales"
           options={VITAL_SIGNS_LEVELS}
@@ -278,7 +282,7 @@ export function CceeForm({
         )}
 
         <Separator />
-        <CceeCategoryInput
+        <CceeCategoryInput<CceeScore>
           id="medicationAndNutrition"
           title="D - Medicación y Nutrición"
           options={MEDICATION_NUTRITION_LEVELS}
@@ -304,23 +308,23 @@ export function CceeForm({
         
         <Separator />
 
-        <CceeCategoryInput
+        <CceeCategoryInput<UnitType>
           id="unitType"
           title="E - Tipo de Unidad (para Escala Específica)"
           options={UNIT_TYPES}
-          selectedValue={formState.unitType as CceeScore | undefined} 
-          onValueChange={(value) => handleUnitTypeChange(value as unknown as UnitType)} 
+          selectedValue={formState.unitType} 
+          onValueChange={handleUnitTypeChange} 
         />
         
         {formState.unitType && (
           <>
             <Separator />
-            <CceeCategoryInput
+            <CceeCategoryInput<CceeScore>
               id="unitSpecificScale"
               title={`E - Escala Específica para: ${UNIT_TYPES.find(ut => ut.value === formState.unitType)?.label || ''}`}
               options={UNIT_SPECIFIC_SCALES[formState.unitType]}
               selectedValue={formState.unitSpecificScale}
-              onValueChange={(value) => handleCategoryChange('unitSpecificScale', value)}
+              onValueChange={handleUnitSpecificScaleChange}
             />
           </>
         )}
@@ -349,4 +353,3 @@ export function CceeForm({
     </Card>
   );
 }
-
