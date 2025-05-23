@@ -343,15 +343,8 @@ export function CceeForm({
           <>
             <Separator />
             <div className="space-y-3">
-                <CceeCategoryInput<CceeScore>
-                  id="unitSpecificScale"
-                  title={`E - Escala Específica para: ${UNIT_TYPES.find(ut => ut.value === formState.unitType)?.label || ''}`}
-                  options={UNIT_SPECIFIC_SCALES[formState.unitType]}
-                  selectedValue={formState.unitSpecificScale}
-                  onValueChange={handleUnitSpecificScaleChange}
-                />
                 {formState.unitType === 'icu' && (
-                  <Accordion type="single" collapsible className="w-full mt-3 pl-2">
+                  <Accordion type="single" collapsible className="w-full mt-3 mb-3 pl-2">
                     <AccordionItem value="sofa-scale-reference-image">
                       <AccordionTrigger className="text-xs hover:no-underline py-2">
                         Ver Tabla de Escala SOFA de Referencia
@@ -374,6 +367,13 @@ export function CceeForm({
                     </AccordionItem>
                   </Accordion>
                 )}
+                <CceeCategoryInput<CceeScore>
+                  id="unitSpecificScale"
+                  title={`E - Escala Específica para: ${UNIT_TYPES.find(ut => ut.value === formState.unitType)?.label || ''}`}
+                  options={UNIT_SPECIFIC_SCALES[formState.unitType]}
+                  selectedValue={formState.unitSpecificScale}
+                  onValueChange={handleUnitSpecificScaleChange}
+                />
             </div>
           </>
         )}
