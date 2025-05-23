@@ -408,15 +408,16 @@ export function CceeForm({
             </AlertDescription>
           </Alert>
         )}
-
-        <Button 
-          onClick={onFormComplete} 
-          disabled={!isFormValid()} 
-          className="w-full sm:w-auto text-base py-3 px-6"
-          size="lg"
-        >
-          Ver Recomendación de Recursos
-        </Button>
+        <div className="flex justify-center">
+          <Button 
+            onClick={onFormComplete} 
+            disabled={!isFormValid()} 
+            className="w-full sm:w-auto text-base py-3 px-6"
+            size="lg"
+          >
+            Ver recomendación de tipo de recurso para traslado a otro centro.
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
