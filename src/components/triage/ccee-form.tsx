@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity } from 'lucide-react'; // Added Activity
+import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -194,6 +194,28 @@ export function CceeForm({
                   Estos cálculos son una estimación basada en el nivel seleccionado.
                 </p>
               )}
+              <Accordion type="single" collapsible className="w-full mt-3">
+                <AccordionItem value="oxygen-reference-image">
+                  <AccordionTrigger className="text-xs hover:no-underline py-2">
+                    Ver imagen de referencia adicional sobre oxígeno
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="relative w-full aspect-[600/400] max-w-md mx-auto bg-muted/30 rounded-md p-1">
+                      <Image
+                        src="/images/oxygen-needs-reference.png" 
+                        alt="Imagen de referencia para necesidades de oxígeno"
+                        width={600}
+                        height={400}
+                        className="rounded-md object-contain"
+                        data-ai-hint="oxygen chart"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 text-center">
+                      Esta es una imagen de ejemplo. Reemplácela con su imagen de referencia.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </AlertDescription>
           </Alert>
         )}
