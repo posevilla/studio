@@ -145,8 +145,9 @@ export function CceeForm({
                   <Image
                     src={capturedImage}
                     alt="Imagen capturada del paciente"
-                    layout="fill"
-                    objectFit="cover"
+                    fill // Changed from layout="fill"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Example sizes, adjust as needed
+                    className="object-cover" // Ensure className is applied
                     data-ai-hint="patient identification" 
                   />
                 </div>
@@ -384,8 +385,26 @@ export function CceeForm({
           <Alert variant="default" className="bg-green-500/10 border-green-500/30 text-green-700 dark:text-green-400">
              <ShieldCheck className="h-5 w-5 text-green-600 dark:text-green-500" />
             <AlertTitle className="font-bold text-green-700 dark:text-green-500">Puntuación Total C.C.E.E.</AlertTitle>
-            <AlertDescription className="text-2xl font-bold">
-              {totalCceeScore}
+            <AlertDescription>
+              <p className="text-2xl font-bold mb-2">{totalCceeScore}</p>
+              <Accordion type="single" collapsible className="w-full text-sm">
+                <AccordionItem value="score-breakdown">
+                  <AccordionTrigger 
+                    className="text-xs hover:no-underline py-1 justify-start text-green-700 dark:text-green-400 hover:text-green-600 dark:hover:text-green-300 [&[data-state=open]>svg]:text-green-600 dark:[&[data-state=open]>svg]:text-green-300"
+                  >
+                    Ver desglose de puntuación
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2 text-green-700/90 dark:text-green-400/90">
+                    <ul className="list-none space-y-1 text-xs">
+                      <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
+                      {formState.oxygenNeed && <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>}
+                      {formState.vitalSignsControl && <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>}
+                      {formState.medicationAndNutrition && <li>D. Medicación y Nutrición: <span className="font-medium">{formState.medicationAndNutrition}</span></li>}
+                      {formState.unitSpecificScale && <li>E. Escala Específica de Unidad: <span className="font-medium">{formState.unitSpecificScale}</span></li>}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </AlertDescription>
           </Alert>
         )}
@@ -403,3 +422,5 @@ export function CceeForm({
   );
 }
 
+
+    
