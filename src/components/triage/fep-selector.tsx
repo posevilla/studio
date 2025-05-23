@@ -63,10 +63,11 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
                 selectedFep === level.value
                   ? 'ring-2 ring-offset-1 ring-offset-background ring-foreground shadow-lg border border-foreground/50'
                   : 'border border-border',
-                // Logic for centering the last item if it's alone in its row on MD or LG screens
-                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 2 !== 0 ? 'md:col-span-2 md:mx-auto' : '',
-                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 3 === 1 ? 'lg:col-span-3 lg:mx-auto' : '',
-                level.value === FEP_LEVELS[FEP_LEVELS.length - 1].value && FEP_LEVELS.length % 3 === 2 && FEP_LEVELS.length > 2 && level.value === FEP_LEVELS[FEP_LEVELS.length-1].value ? 'lg:col-start-2' : '' // If 2 items in last row of 3-col grid, start 2nd item in 2nd col
+                // Logic for centering items in the last row
+                FEP_LEVELS.length % 3 === 1 && level.value === FEP_LEVELS[FEP_LEVELS.length -1].value ? 'lg:col-span-3 lg:w-1/3 lg:mx-auto md:col-span-2 md:w-1/2 md:mx-auto' :
+                FEP_LEVELS.length % 3 === 2 && level.value === FEP_LEVELS[FEP_LEVELS.length -2].value ? 'lg:col-start-1 lg:w-auto' : // Ensure first of two starts normally
+                FEP_LEVELS.length % 3 === 2 && level.value === FEP_LEVELS[FEP_LEVELS.length -1].value ? 'lg:col-start-2 lg:w-auto' : // Ensure second of two starts in second col
+                FEP_LEVELS.length % 2 !== 0 && level.value === FEP_LEVELS[FEP_LEVELS.length -1].value && FEP_LEVELS.length % 3 !== 1 ? 'md:col-span-2 md:w-1/2 md:mx-auto' : ''
 
               )}
               onClick={() => onFepSelect(level.value)}
@@ -76,8 +77,9 @@ export function FepSelector({ selectedFep, onFepSelect }: FepSelectorProps) {
                   <Image
                     src={level.iconSrc}
                     alt={`Icono para ${level.label}`}
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    sizes="48px"
+                    className="object-contain"
                     data-ai-hint={level.iconAiHint || "triage icon"}
                   />
                 </div>

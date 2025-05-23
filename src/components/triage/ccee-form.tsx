@@ -145,9 +145,9 @@ export function CceeForm({
                   <Image
                     src={capturedImage}
                     alt="Imagen capturada del paciente"
-                    fill // Changed from layout="fill"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Example sizes, adjust as needed
-                    className="object-cover" // Ensure className is applied
+                    fill 
+                    sizes="80px" 
+                    className="object-cover" 
                     data-ai-hint="patient identification" 
                   />
                 </div>
@@ -282,7 +282,7 @@ export function CceeForm({
             <AlertDescription>
               <ul className="list-none mt-1 space-y-1 text-sm">
                 <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
-                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
+                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed ?? 'N/A'}</span></li>
                 <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>
                 <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{subtotalAfterVitals}</span></li>
               </ul>
@@ -306,8 +306,8 @@ export function CceeForm({
             <AlertDescription>
               <ul className="list-none mt-1 space-y-1 text-sm">
                 <li>A. F.E.P.: <span className="font-medium">{fepScore}</span></li>
-                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed}</span></li>
-                <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl}</span></li>
+                <li>B. Necesidad de Oxígeno: <span className="font-medium">{formState.oxygenNeed ?? 'N/A'}</span></li>
+                <li>C. Control Constantes Vitales: <span className="font-medium">{formState.vitalSignsControl ?? 'N/A'}</span></li>
                 <li>D. Medicación y Nutrición: <span className="font-medium">{formState.medicationAndNutrition}</span></li>
                 <li className="font-semibold pt-1">Suma Parcial: <span className="text-lg font-bold">{subtotalAfterMedication}</span></li>
               </ul>
@@ -422,6 +422,3 @@ export function CceeForm({
     </Card>
   );
 }
-
-
-    
