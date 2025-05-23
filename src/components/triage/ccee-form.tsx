@@ -11,6 +11,14 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CceeCategoryInput } from './ccee-category-input';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ShieldCheck, Info, HelpCircle, TrendingUp, Activity, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -308,13 +316,28 @@ export function CceeForm({
         
         <Separator />
 
-        <CceeCategoryInput<UnitType>
-          id="unitType"
-          title="E - Tipo de Unidad (para Escala Específica)"
-          options={UNIT_TYPES}
-          selectedValue={formState.unitType} 
-          onValueChange={handleUnitTypeChange} 
-        />
+        <div className="space-y-3">
+          <Label htmlFor="unitTypeSelect" className="text-md font-semibold text-foreground">E - Tipo de Unidad (para Escala Específica)</Label>
+          <Select
+            value={formState.unitType}
+            onValueChange={(value: UnitType | undefined) => { // Allow undefined for reset if needed, or ensure a valid UnitType
+              if (value) {
+                 handleUnitTypeChange(value);
+              }
+            }}
+          >
+            <SelectTrigger id="unitTypeSelect" className="w-full">
+              <SelectValue placeholder="Seleccione un tipo de unidad..." />
+            </SelectTrigger>
+            <SelectContent>
+              {UNIT_TYPES.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         
         {formState.unitType && (
           <>
@@ -353,3 +376,4 @@ export function CceeForm({
     </Card>
   );
 }
+
